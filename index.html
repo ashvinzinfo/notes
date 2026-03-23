@@ -1,2110 +1,1541 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ashvinz Notes</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom CSS for glassmorphism and animations -->
-    <style>
-        * {
-            font-family: 'Sora', sans-serif;
-        }
-        :root {
-            --primary: #2563EB;
-            --primary-dark: #1e40af;
-            --dark: #0F172A;
-            --light: #f8fafc;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-        }
-        body {
-            transition: background-color 0.3s ease;
-            background: #ffffff;
-        }
-        body.dark {
-            background: #0f172a;
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        .dark .glass {
-            background: rgba(30, 41, 59, 0.95);
-            border: 1px solid rgba(226, 232, 240, 0.1);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-        body.neon {
-            background: radial-gradient(circle at 20% 20%, rgba(56, 189, 248, 0.25), rgba(4, 120, 87, 0.85) 35%, #041E1A 100%);
-            color: #A7F3D0;
-        }
-        body.neon .glass {
-            background: rgba(0, 0, 0, 0.45);
-            border: 1px solid rgba(34, 197, 94, 0.65);
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ashvinz Notes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { font-family: 'Sora', sans-serif; box-sizing: border-box; }
 
-        body.pink {
-            background: radial-gradient(circle at 20% 15%, rgba(255, 182, 193, 0.35), rgba(231, 76, 170, 0.7) 45%, #2b021a 100%);
-            color: #FFD6E8;
-        }
-        body.pink .glass {
-            background: rgba(44, 15, 40, 0.8);
-            border: 1px solid rgba(255, 105, 180, 0.6);
-            box-shadow: 0 0 20px rgba(255, 105, 180, 0.35);
-        }
-        body.pink .note-card {
-            border-color: rgba(255, 182, 193, 0.4);
-            box-shadow: 0 10px 25px rgba(244, 105, 180, 0.22);
-        }
-        body.pink .tab-btn.active {
-            background: rgba(255, 105, 180, 0.2);
-            border-bottom: 2px solid rgba(255, 105, 180, 0.8);
-            color: #fee2e2;
-        }
+    /* ─── Canvas BG ─── */
+    #bgCanvas {
+      position: fixed; inset: 0; z-index: -1;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
 
-        body.forest {
-            background: radial-gradient(circle at 15% 15%, rgba(28, 112, 80, 0.38), rgba(5, 50, 35, 0.85) 40%, #041e14 100%);
-            color: #B7F3DB;
-        }
-        body.forest .glass {
-            background: rgba(6, 39, 26, 0.85);
-            border: 1px solid rgba(20, 184, 77, 0.65);
-            box-shadow: 0 0 18px rgba(20, 184, 77, 0.28);
-        }
-        body.forest .note-card {
-            border-color: rgba(30, 140, 90, 0.45);
-            box-shadow: 0 10px 25px rgba(30, 140, 90, 0.2);
-        }
+    /* ─── Theme base ─── */
+    body { background: #07111e; color: #e2e8f0; min-height: 100vh; transition: background 0.4s; }
+    body.light { background: #f0f4f8; color: #1e293b; }
 
-        body.twilight {
-            background: radial-gradient(circle at 30% 10%, rgba(110, 73, 207, 0.38), rgba(12, 12, 56, 0.9) 45%, #090619 100%);
-            color: #C0B8FF;
-        }
-        body.twilight .glass {
-            background: rgba(20, 14, 64, 0.75);
-            border: 1px solid rgba(138, 75, 224, 0.55);
-            box-shadow: 0 0 20px rgba(145, 95, 238, 0.3);
-        }
-        body.twilight .note-card {
-            border-color: rgba(115, 84, 215, 0.44);
-            box-shadow: 0 10px 25px rgba(120, 95, 210, 0.18);
-        }
-        body.neon .note-card {
-            border-color: rgba(34, 197, 94, 0.5);
-            box-shadow: 0 5px 20px rgba(34, 197, 94, 0.35);
-        }
-        .background-animation {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-            overflow: hidden;
-            background: linear-gradient(120deg, rgba(5, 40, 50, 0.85), rgba(2, 2, 40, 0.7));
-            transition: background 1.2s ease;
-        }
-        .bg-canvas {
-            position: fixed;
-            inset: 0;
-            z-index: -2;
-            pointer-events: none;
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        .background-animation.active {
-            background: linear-gradient(130deg, rgba(7, 130, 108, 0.7), rgba(0, 25, 35, 0.8));
-        }
-        .background-animation .bg-wave {
-            position: absolute;
-            width: 250%;
-            height: 250%;
-            top: -75%;
-            left: -75%;
-            background: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.25), transparent 55%);
-            opacity: 0.35;
-            transform: translate(0, 0) scale(1);
-            border-radius: 45%;
-            animation: waveMove 24s linear infinite;
-        }
-        .background-animation .bg-wave:nth-child(2) {
-            background: radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.2), transparent 55%);
-            animation-duration: 28s;
-            opacity: 0.28;
-            transform: translate(-15%, -20%) scale(1.2);
-        }
-        .background-animation .bg-wave:nth-child(3) {
-            background: radial-gradient(circle at 60% 35%, rgba(14, 165, 233, 0.2), transparent 55%);
-            animation-duration: 32s;
-            opacity: 0.22;
-            transform: translate(20%, 15%) scale(0.95);
-        }
+    /* ─── Glass ─── */
+    .glass {
+      background: rgba(15, 25, 45, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(100, 180, 255, 0.12);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    body.light .glass {
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(37,99,235,0.1);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
 
-        .background-animation .bg-object {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.35);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4), 0 0 40px rgba(34, 197, 94, 0.2);
-            animation: floatAround 18s ease-in-out infinite;
-            pointer-events: none;
-            mix-blend-mode: screen;
-            filter: blur(0.6px);
-        }
+    /* ─── Color dot (FIXED: was missing) ─── */
+    .color-dot {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .color-dot:hover { transform: scale(1.25); border-color: #38bdf8; }
+    .color-dot.active { border-color: #38bdf8; transform: scale(1.2); }
 
-        @keyframes floatAround {
-            0% { transform: translate(0, 0) scale(0.8); opacity: 0.6; }
-            25% { transform: translate(40px, -30px) scale(1); opacity: 0.8; }
-            50% { transform: translate(-35px, 20px) scale(1.1); opacity: 0.5; }
-            75% { transform: translate(30px, 25px) scale(0.9); opacity: 0.7; }
-            100% { transform: translate(0, 0) scale(0.8); opacity: 0.6; }
-        }
+    /* ─── Note card ─── */
+    .note-card {
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      break-inside: avoid;
+      border: 1px solid rgba(100,180,255,0.1);
+    }
+    .note-card:hover {
+      transform: translateY(-5px) rotateX(2deg);
+      box-shadow: 0 16px 40px rgba(56,189,248,0.18);
+      border-color: rgba(56,189,248,0.3);
+    }
 
-        @keyframes waveMove {
-            0% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(20%, -12%) scale(1.05); }
-            50% { transform: translate(-16%, 18%) scale(1.03); }
-            75% { transform: translate(13%, 8%) scale(0.97); }
-            100% { transform: translate(0, 0) scale(1); }
-        }
+    /* ─── Task card ─── */
+    .task-card {
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid rgba(100,180,255,0.1);
+    }
+    .task-card:hover { transform: translateX(4px); box-shadow: 0 6px 20px rgba(56,189,248,0.12); }
 
-        .neon-object {
-            position: fixed;
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(20, 200, 160, 0.9), rgba(0, 128, 106, 0.15));
-            box-shadow: 0 0 50px rgba(20, 200, 160, 0.8), 0 0 80px rgba(34, 197, 94, 0.5);
-            z-index: 0;
-            pointer-events: none;
-            animation: neonMove 12s ease-in-out infinite;
-            opacity: .55;
-        }
-        @keyframes neonMove {
-            0% { transform: translate(0px, 0px) scale(1); }
-            25% { transform: translate(40px, -30px) scale(1.1); }
-            50% { transform: translate(-30px, 20px) scale(0.95); }
-            75% { transform: translate(20px, -40px) scale(1.05); }
-            100% { transform: translate(0px, 0px) scale(1); }
-        }
-        .note-card {
-            transition: all 0.3s ease;
-            transform-style: preserve-3d;
-            perspective: 1000px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        .note-card:hover {
-            transform: translateY(-4px) rotateX(2deg);
-            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
-            border-color: rgba(37, 99, 235, 0.2);
-        }
-        .dark .note-card:hover {
-            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
-        }
-        .modal-enter {
-            animation: modalEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        @keyframes modalEnter {
-            0% { 
-                opacity: 0; 
-                transform: scale(0.5) rotateX(-20deg) rotateY(20deg);
-            }
-            70% {
-                transform: scale(1.05) rotateX(5deg) rotateY(-5deg);
-            }
-            100% { 
-                opacity: 1; 
-                transform: scale(1) rotateX(0) rotateY(0);
-            }
-        }
-        .masonry-grid {
-            column-gap: 1rem;
-        }
-        @media (min-width: 640px) {
-            .masonry-grid { column-count: 2; }
-        }
-        @media (min-width: 768px) {
-            .masonry-grid { column-count: 3; }
-        }
-        @media (min-width: 1024px) {
-            .masonry-grid { column-count: 4; }
-        }
-        @media (min-width: 1280px) {
-            .masonry-grid { column-count: 5; }
-        }
-        .list-view .masonry-grid {
-            column-count: 1 !important;
-        }
-        .list-view .note-card {
-            width: 100%;
-            margin-bottom: 1rem;
-        }
-        /* 3D Button Effects */
-        button {
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        button:hover {
-            transform: translateY(-2px) rotateZ(1deg);
-        }
-        button:active {
-            transform: translateY(0) rotateZ(0);
-        }
-        /* 3D Sidebar Effects */
-        aside {
-            perspective: 1000px;
-            border-right: 1px solid rgba(0, 0, 0, 0.05);
-        }
-        .dark aside {
-            border-right-color: rgba(226, 232, 240, 0.1);
-        }
-        .sidebar-item {
-            transition: all 0.2s ease;
-            transform-style: preserve-3d;
-            padding: 12px 16px;
-            margin: 0;
-            border-radius: 6px;
-            color: var(--gray-600);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        .dark .sidebar-item {
-            color: rgb(203, 213, 225);
-        }
-        .sidebar-item:hover {
-            background-color: var(--gray-100);
-            transform: translateX(2px);
-        }
-        .dark .sidebar-item:hover {
-            background-color: rgba(226, 232, 240, 0.1);
-        }
-        .sidebar-item.active {
-            background-color: rgba(37, 99, 235, 0.1);
-            color: var(--primary);
-            border-left: 3px solid var(--primary);
-            padding-left: 13px;
-            font-weight: 600;
-        }
-        .dark .sidebar-item.active {
-            background-color: rgba(37, 99, 235, 0.15);
-        }
-        /* 3D Header Effects */
-        header {
-            perspective: 1000px;
-        }
-        /* Subtle animations */
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in-scale {
-            animation: slideIn 0.3s ease-out;
-        }
-        .tab-btn {
-            position: relative;
-            transition: all 0.2s ease;
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 15px;
-            color: var(--gray-600);
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-        .dark .tab-btn {
-            color: rgb(203, 213, 225);
-        }
-        .tab-btn:hover {
-            color: var(--primary);
-            background-color: var(--gray-100);
-        }
-        .dark .tab-btn:hover {
-            background-color: rgba(226, 232, 240, 0.1);
-        }
-        .tab-btn.active {
-            color: var(--primary);
-            background-color: rgba(37, 99, 235, 0.08);
-        }
-        .dark .tab-btn.active {
-            background-color: rgba(37, 99, 235, 0.2);
-        }
-        .tab-btn::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 20px;
-            right: 20px;
-            height: 2px;
-            background: var(--primary);
-            transform: scaleX(0);
-            transition: transform 0.2s ease;
-        }
-        .tab-btn.active::after {
-            transform: scaleX(1);
-        }
-        /* Enhanced 3D Animations */
-        @keyframes pulse3d {
-            0%, 100% { transform: scale(1) rotateX(0); }
-            50% { transform: scale(1.02) rotateX(2deg); }
-        }
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-        .shimmer-effect {
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            background-size: 1000px 100%;
-            animation: shimmer 3s infinite;
-        }
-        .task-card {
-            transition: all 0.2s ease;
-            transform-style: preserve-3d;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        .task-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.12);
-            border-color: rgba(37, 99, 235, 0.2);
-        }
-        .dark .task-card:hover {
-            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
-        }
-        .stat-card {
-            transition: all 0.2s ease;
-            background: rgba(37, 99, 235, 0.05);
-            border: 1px solid rgba(37, 99, 235, 0.1);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.15);
-            border-color: rgba(37, 99, 235, 0.3);
-        }
-        .dark .stat-card {
-            background: rgba(37, 99, 235, 0.08);
-            border-color: rgba(37, 99, 235, 0.15);
-        }
-        .dark .stat-card:hover {
-            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
-        }
-        .trash-item {
-            opacity: 1;
-            background: rgba(239, 68, 68, 0.05);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-left: 3px solid #ef4444;
-        }
-        .trash-item:hover {
-            opacity: 1;
-            background: rgba(239, 68, 68, 0.1);
-            box-shadow: 0 8px 16px rgba(239, 68, 68, 0.15);
-        }
-    </style>
+    /* ─── Stat card ─── */
+    .stat-card {
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 1px solid rgba(56,189,248,0.15);
+    }
+    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(56,189,248,0.2); }
+
+    /* ─── Trash item ─── */
+    .trash-item {
+      border-left: 3px solid #ef4444;
+      background: rgba(239,68,68,0.05);
+      border: 1px solid rgba(239,68,68,0.2);
+      transition: box-shadow 0.2s;
+    }
+    .trash-item:hover { box-shadow: 0 6px 20px rgba(239,68,68,0.15); }
+
+    /* ─── Sidebar ─── */
+    .sidebar-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 14px; border-radius: 8px;
+      font-size: 14px; font-weight: 500;
+      color: #94a3b8;
+      transition: all 0.18s ease;
+      cursor: pointer; text-decoration: none;
+    }
+    .sidebar-item:hover { background: rgba(56,189,248,0.1); color: #38bdf8; transform: translateX(3px); }
+    .sidebar-item.active {
+      background: rgba(56,189,248,0.15);
+      color: #38bdf8;
+      border-left: 3px solid #38bdf8;
+      padding-left: 11px;
+    }
+    body.light .sidebar-item { color: #475569; }
+    body.light .sidebar-item:hover { color: #2563eb; background: rgba(37,99,235,0.08); }
+    body.light .sidebar-item.active { color: #2563eb; border-color: #2563eb; background: rgba(37,99,235,0.1); }
+
+    /* ─── Tab buttons ─── */
+    .tab-btn {
+      position: relative; padding: 10px 18px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; color: #64748b;
+      background: none; border: none; cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: #38bdf8; background: rgba(56,189,248,0.08); }
+    .tab-btn.active { color: #38bdf8; background: rgba(56,189,248,0.15); }
+    .tab-btn::after {
+      content: ''; position: absolute; bottom: 0; left: 18px; right: 18px;
+      height: 2px; background: #38bdf8;
+      transform: scaleX(0); transition: transform 0.2s;
+    }
+    .tab-btn.active::after { transform: scaleX(1); }
+    body.light .tab-btn { color: #64748b; }
+    body.light .tab-btn.active { color: #2563eb; background: rgba(37,99,235,0.08); }
+    body.light .tab-btn::after { background: #2563eb; }
+
+    /* ─── Masonry ─── */
+    .masonry-grid { column-gap: 1rem; }
+    @media (min-width: 640px)  { .masonry-grid { column-count: 2; } }
+    @media (min-width: 768px)  { .masonry-grid { column-count: 3; } }
+    @media (min-width: 1024px) { .masonry-grid { column-count: 4; } }
+    @media (min-width: 1280px) { .masonry-grid { column-count: 5; } }
+    .list-view .masonry-grid  { column-count: 1 !important; }
+
+    /* ─── Modal ─── */
+    .modal-enter { animation: modalPop 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
+    @keyframes modalPop {
+      from { opacity:0; transform:scale(0.6) rotateX(-15deg); }
+      to   { opacity:1; transform:scale(1) rotateX(0); }
+    }
+
+    /* ─── Fade in ─── */
+    .fade-in { animation: fadeIn 0.3s ease both; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+    /* ─── Buttons ─── */
+    button { transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    button:hover { transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+
+    /* ─── Mobile ─── */
+    @media (max-width: 768px) {
+      .tab-btn .tab-text { display: none; }
+      aside {
+        position: fixed; top:0; left:0; width:80vw; max-width:300px;
+        height:100%; z-index:50; transform:translateX(-110%);
+        transition:transform 0.25s ease;
+      }
+      aside.open { transform:translateX(0); }
+    }
+
+    /* ─── Input styles ─── */
+    input[type=text], textarea {
+      color: inherit;
+    }
+    body.light input[type=text],
+    body.light textarea { color: #1e293b; }
+    body.light input::placeholder,
+    body.light textarea::placeholder { color: #94a3b8; }
+
+    /* ─── Quick stats strip ─── */
+    .quick-stat { text-align:center; padding:8px 0; }
+    .quick-stat .val { font-size:1.4rem; font-weight:700; color:#38bdf8; }
+    .quick-stat .lbl { font-size:0.65rem; color:#64748b; text-transform:uppercase; letter-spacing:.05em; }
+    body.light .quick-stat .val { color:#2563eb; }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:rgba(56,189,248,0.3); border-radius:9px; }
+  </style>
 </head>
-<body class="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200 min-h-screen">
-    <canvas id="bgCanvas" class="bg-canvas"></canvas>
-    <div id="backgroundAnimation" class="background-animation"></div>
-    <div id="neonObject" class="neon-object hidden"></div>
-    <!-- Header -->
-    <header class="sticky top-0 z-50 glass border-b border-gray-200 dark:border-slate-700">
-        <div class="container mx-auto px-6 py-4 flex items-center justify-between">
-            <!-- Logo -->
-            <div class="flex items-center space-x-3">
-                <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Toggle Menu">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">A</span>
-                    </div>
-                    <h1 class="text-xl font-bold text-gray-900 dark:text-white">Ashvinz Notes</h1>
-                </div>
-            </div>
+<body>
 
-            <!-- Search Bar -->
-            <div class="flex-1 max-w-2xl mx-6 hidden md:block">
-                <div class="relative">
-                    <input type="text" id="searchInput" placeholder="Search notes..." class="w-full py-2 pl-10 pr-4 rounded-lg bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                </div>
-            </div>
+<!-- ═══ CANVAS BACKGROUND ═══ -->
+<canvas id="bgCanvas"></canvas>
 
-            <!-- Header Actions -->
-            <div class="flex items-center space-x-2 md:space-x-3">
-                <button id="mobileSearchBtn" class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Search">
-                    <i class="fas fa-search text-xl"></i>
-                </button>
-                <button id="viewToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Toggle Grid/List View">
-                    <i class="fas fa-th-large text-xl"></i>
-                </button>
-                <button id="themeToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Toggle Dark/Light Mode">
-                    <i class="fas fa-moon text-xl"></i>
-                </button>
-                <button id="settingsBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" title="Settings">
-                    <i class="fas fa-cog text-xl"></i>
-                </button>
-            </div>
-        </div>
-    </header>
+<!-- ═══ HEADER ═══ -->
+<header class="sticky top-0 z-40 glass border-b border-white/5">
+  <div class="container mx-auto px-4 py-3 flex items-center gap-3">
 
-    <div class="flex">
-        <!-- Sidebar -->
-        <aside class="hidden md:block w-64 glass min-h-screen py-6 px-4 overflow-y-auto">
-            <nav class="space-y-1">
-                <div class="px-4 py-2 mb-2">
-                    <h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Main</h3>
-                </div>
-                <a href="#" class="sidebar-item active" data-filter="all">
-                    <i class="fas fa-file-alt"></i>
-                    <span>All Notes</span>
-                </a>
-                <a href="#" class="sidebar-item" data-filter="reminders">
-                    <i class="fas fa-clock"></i>
-                    <span>Reminders</span>
-                </a>
-                <a href="#" class="sidebar-item" data-filter="labels">
-                    <i class="fas fa-bookmark"></i>
-                    <span>Labels</span>
-                </a>
-                <a href="#" class="sidebar-item" data-filter="archive">
-                    <i class="fas fa-box"></i>
-                    <span>Archive</span>
-                </a>
-                <a href="#" class="sidebar-item" data-filter="trash">
-                    <i class="fas fa-trash-alt"></i>
-                    <span>Trash</span>
-                </a>
-            </nav>
+    <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-white/10 text-slate-300">
+      <i class="fas fa-bars text-lg"></i>
+    </button>
 
-            <div class="mt-8">
-                <div class="px-4 py-2 mb-3">
-                    <h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Labels</h3>
-                </div>
-                <div id="labelsList" class="space-y-1">
-                    <!-- Labels will be dynamically added -->
-                </div>
-                <div class="mt-4">
-                    <button id="addLabelBtn" class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center text-sm font-medium transition-colors">
-                        <i class="fas fa-plus mr-2"></i> Add Label
-                    </button>
-                </div>
-            </div>
-
-
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 p-6">
-            <!-- Tab Navigation -->
-            <div class="flex items-center space-x-1 mb-6 pb-4 border-b border-gray-200 dark:border-slate-700 max-w-full overflow-x-auto">
-                <button class="tab-btn active text-sm font-medium px-4 py-2" data-tab="notes">
-                    <i class="fas fa-file-alt mr-2"></i><span class="tab-text">Notes</span>
-                </button>
-                <button class="tab-btn text-sm font-medium px-4 py-2" data-tab="tasks">
-                    <i class="fas fa-list-check mr-2"></i><span class="tab-text">Daily Tasks</span>
-                </button>
-                <button class="tab-btn text-sm font-medium px-4 py-2" data-tab="stats">
-                    <i class="fas fa-chart-line mr-2"></i><span class="tab-text">Statistics</span>
-                </button>
-                <button class="tab-btn text-sm font-medium px-4 py-2" data-tab="trash">
-                    <i class="fas fa-trash-alt mr-2"></i><span class="tab-text">Trash</span>
-                </button>
-            </div>
-
-            <!-- Notes Tab -->
-            <div id="notesTab" class="tab-content">
-            <!-- Quick Add Bar -->
-            <div class="glass rounded-xl p-6 mb-8 max-w-4xl mx-auto">
-                <div class="flex items-center">
-                    <input type="text" id="quickTitle" placeholder="Create a new note..." class="flex-1 bg-transparent border-none outline-none text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500">
-                    <div class="flex space-x-2">
-                        <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400 transition-colors" title="Add Text">
-                            <i class="fas fa-font"></i>
-                        </button>
-                        <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400 transition-colors" title="Add Checklist">
-                            <i class="fas fa-list-check"></i>
-                        </button>
-                        <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400 transition-colors" title="Add Image">
-                            <i class="fas fa-image"></i>
-                        </button>
-                        <button id="quickAddBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                            Add
-                        </button>
-                    </div>
-                </div>
-                <div id="quickOptions" class="mt-4 hidden">
-                    <div class="flex items-center space-x-4">
-                        <div class="flex space-x-2">
-                            <!-- Color picker dots -->
-                            <div class="color-dot bg-white" data-color="#ffffff"></div>
-                            <div class="color-dot bg-red-200" data-color="#fecaca"></div>
-                            <div class="color-dot bg-yellow-200" data-color="#fef3c7"></div>
-                            <div class="color-dot bg-green-200" data-color="#bbf7d0"></div>
-                            <div class="color-dot bg-blue-200" data-color="#bfdbfe"></div>
-                            <div class="color-dot bg-purple-200" data-color="#e9d5ff"></div>
-                        </div>
-                        <button class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"><i class="fas fa-bell mr-1"></i> Reminder</button>
-                        <button class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"><i class="fas fa-tag mr-1"></i> Label</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notes Grid -->
-            <div id="notesContainer" class="masonry-grid">
-                <!-- Notes will be dynamically inserted here -->
-                <!-- Example note card (will be removed by JS) -->
-                <div class="note-card glass rounded-xl p-4 mb-4 break-inside-avoid" style="background-color: #fef3c7;">
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-lg">Welcome to Ashvinz Notes!</h3>
-                        <button class="text-gray-500 hover:text-gray-800" title="Pin note">
-                            <i class="fas fa-thumbtack"></i>
-                        </button>
-                    </div>
-                    <p class="mt-2">This is a sample note. You can edit, delete, pin, or change its color.</p>
-                    <div class="mt-4 flex justify-between items-center">
-                        <span class="text-xs text-gray-500">Just now</span>
-                        <div class="flex space-x-2">
-                            <button class="text-gray-500 hover:text-teal-500" title="Change color"><i class="fas fa-palette"></i></button>
-                            <button class="text-gray-500 hover:text-teal-500" title="Archive note"><i class="fas fa-archive"></i></button>
-                            <button class="text-gray-500 hover:text-red-500" title="Delete note"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Empty State -->
-            <div id="emptyState" class="text-center py-12 hidden">
-                <i class="fas fa-sticky-note text-6xl text-gray-300 dark:text-gray-700 mb-4"></i>
-                <h3 class="text-xl font-semibold text-gray-500">No notes yet</h3>
-                <p class="text-gray-400">Create your first note using the quick add bar above.</p>
-            </div>
-            </div>
-
-            <!-- Daily Tasks Tab -->
-            <div id="tasksTab" class="tab-content hidden">
-                <div class="glass rounded-xl p-6 mb-6">
-                    <div class="flex items-center gap-3">
-                        <input type="text" id="taskInput" placeholder="Add a new task..." class="flex-1 bg-transparent border-none outline-none text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500">
-                        <button id="addTaskBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                            Add
-                        </button>
-                    </div>
-                </div>
-                <div id="tasksContainer" class="space-y-3">
-                    <!-- Tasks will be inserted here -->
-                </div>
-                <div id="emptyTasksState" class="text-center py-12">
-                    <i class="fas fa-tasks text-6xl text-gray-300 dark:text-gray-700 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-500">No tasks yet</h3>
-                    <p class="text-gray-400">Add a task above to track your daily progress.</p>
-                </div>
-            </div>
-
-            <!-- Statistics Tab -->
-            <div id="statsTab" class="tab-content hidden">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="stat-card glass rounded-xl p-6">
-                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Total Notes</p>
-                        <p class="text-4xl font-bold text-blue-600" id="statTotalNotes">0</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">All time</p>
-                    </div>
-                    <div class="stat-card glass rounded-xl p-6">
-                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Tasks Completed</p>
-                        <p class="text-4xl font-bold text-green-600" id="statTasksCompleted">0</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">This month</p>
-                    </div>
-                    <div class="stat-card glass rounded-xl p-6">
-                        <p class="text-gray-600 dark:text-gray-400 text-sm font-medium mb-2">Completion Rate</p>
-                        <p class="text-4xl font-bold text-blue-600" id="statCompletionRate">0%</p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">This month</p>
-                    </div>
-                </div>
-
-                <div class="glass rounded-xl p-6 mb-6">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Monthly Progress</h3>
-                    <div class="overflow-x-auto">
-                        <canvas id="monthlyChart" height="80"></canvas>
-                    </div>
-                </div>
-
-                <div class="glass rounded-xl p-6">
-                    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Yearly Overview</h3>
-                    <div class="grid grid-cols-4 md:grid-cols-12 gap-3" id="yearlyHeatmap">
-                        <!-- Monthly heatmap -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Trash Tab -->
-            <div id="trashTab" class="tab-content hidden">
-                <div class="mb-6 flex gap-3">
-                    <button id="emptyTrashBtn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                        <i class="fas fa-trash mr-2"></i>Empty Trash
-                    </button>
-                    <button id="restoreAllBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                        <i class="fas fa-undo mr-2"></i>Restore All
-                    </button>
-                </div>
-                <div id="trashContainer" class="space-y-3">
-                    <!-- Trash items will be inserted here -->
-                </div>
-                <div id="emptyTrashState" class="text-center py-12">
-                    <i class="fas fa-trash-can text-6xl text-gray-300 dark:text-gray-600 mb-4"></i>
-                    <h3 class="text-xl font-semibold text-gray-500">Trash is empty</h3>
-                    <p class="text-gray-400">Deleted items will appear here.</p>
-                </div>
-            </div>
-        </main>
+    <div class="flex items-center gap-2 shrink-0">
+      <div class="w-9 h-9 rounded-lg flex items-center justify-center"
+           style="background:linear-gradient(135deg,#38bdf8,#0ea5e9)">
+        <span class="text-white font-bold">A</span>
+      </div>
+      <h1 class="text-lg font-bold text-white hidden sm:block">Ashvinz Notes</h1>
     </div>
 
-    <!-- Modal for editing notes -->
-    <div id="noteModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/50 backdrop-blur-sm">
-        <div class="glass rounded-xl w-full max-w-2xl mx-4 modal-enter relative z-10">
-            <div class="p-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Edit Note</h2>
-                    <button id="closeModal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors" title="Close modal">
-                        <i class="fas fa-times text-2xl"></i>
-                    </button>
-                </div>
-                <input type="text" id="modalTitle" placeholder="Note title..." class="w-full text-2xl font-bold bg-transparent border-none outline-none mb-4 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500">
-                <textarea id="modalContent" placeholder="Note content..." class="w-full h-64 bg-transparent border-none outline-none resize-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500"></textarea>
-                <input id="modalLabels" type="text" placeholder="Labels (comma-separated)" class="w-full mt-3 px-3 py-2 bg-transparent border border-gray-300 rounded-lg outline-none text-gray-800 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500">
-                <div class="flex flex-wrap gap-2 my-6" id="modalChecklist">
-                    <!-- Checklist items -->
-                </div>
-                <div class="flex items-center justify-between mt-8 pt-6 border-t border-gray-200 dark:border-slate-700">
-                    <div class="flex space-x-3">
-                        <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400 transition-colors" title="Text">
-                            <i class="fas fa-font"></i>
-                        </button>
-                        <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400 transition-colors" title="Checklist">
-                            <i class="fas fa-list-check"></i>
-                        </button>
-                        <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400 transition-colors" title="Image">
-                            <i class="fas fa-image"></i>
-                        </button>
-                        <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400 transition-colors" title="Reminder">
-                            <i class="fas fa-bell"></i>
-                        </button>
-                        <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400 transition-colors" title="Color">
-                            <i class="fas fa-palette"></i>
-                        </button>
-                        <button class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-400 transition-colors" title="Label">
-                            <i class="fas fa-tag"></i>
-                        </button>
-                    </div>
-                    <div>
-                        <button id="saveNote" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                            Save
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="flex-1 max-w-xl mx-2 hidden md:block">
+      <div class="relative">
+        <input id="searchInput" type="text" placeholder="Search notes…"
+          class="w-full py-2 pl-9 pr-4 rounded-lg bg-white/8 border border-white/10
+                 focus:outline-none focus:ring-1 focus:ring-sky-400 text-sm
+                 placeholder-slate-400 text-slate-100">
+        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+      </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/50 backdrop-blur-sm">
-        <div class="glass rounded-xl w-full max-w-lg mx-4 p-6 relative modal-enter">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Settings</h2>
-                <button id="closeSettings" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" title="Close settings"><i class="fas fa-times text-2xl"></i></button>
-            </div>
-            <div class="space-y-3 text-sm">
-                <label class="flex items-center justify-between">
-                    <span>Show All Notes</span>
-                    <input type="checkbox" id="settingAll" checked>
-                </label>
-                <label class="flex items-center justify-between">
-                    <span>Show Reminders</span>
-                    <input type="checkbox" id="settingReminders" checked>
-                </label>
-                <label class="flex items-center justify-between">
-                    <span>Show Labels</span>
-                    <input type="checkbox" id="settingLabels" checked>
-                </label>
-                <label class="flex items-center justify-between">
-                    <span>Show Archive</span>
-                    <input type="checkbox" id="settingArchive" checked>
-                </label>
-                <label class="flex items-center justify-between">
-                    <span>Show Trash</span>
-                    <input type="checkbox" id="settingTrash" checked>
-                </label>
-                <label class="flex items-center justify-between">
-                    <span>Show Animated Background</span>
-                    <input type="checkbox" id="settingBgObject" checked>
-                </label>
-            </div>
-            <div class="mt-6 flex justify-end">
-                <button id="saveSettings" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-medium">Save</button>
-            </div>
-        </div>
+    <div class="flex items-center gap-1 ml-auto">
+      <button id="mobileSearchBtn" class="md:hidden p-2 rounded-lg hover:bg-white/10 text-slate-300">
+        <i class="fas fa-search"></i>
+      </button>
+      <button id="viewToggle" class="p-2 rounded-lg hover:bg-white/10 text-slate-300" title="Toggle view">
+        <i class="fas fa-th-large"></i>
+      </button>
+      <button id="themeToggle" class="p-2 rounded-lg hover:bg-white/10 text-slate-300" title="Toggle theme">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button id="settingsBtn" class="p-2 rounded-lg hover:bg-white/10 text-slate-300" title="Settings">
+        <i class="fas fa-cog"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="flex">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside id="sidebar" class="w-60 glass shrink-0 min-h-screen py-5 px-3 overflow-y-auto hidden md:block">
+    <nav class="space-y-0.5">
+      <p class="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-widest">Navigation</p>
+      <a href="#" class="sidebar-item active" data-filter="all">
+        <i class="fas fa-file-alt w-4"></i><span>All Notes</span>
+      </a>
+      <a href="#" class="sidebar-item" data-filter="reminders">
+        <i class="fas fa-clock w-4"></i><span>Reminders</span>
+      </a>
+      <a href="#" class="sidebar-item" data-filter="labels">
+        <i class="fas fa-bookmark w-4"></i><span>Labels</span>
+      </a>
+      <a href="#" class="sidebar-item" data-filter="archive">
+        <i class="fas fa-box w-4"></i><span>Archive</span>
+      </a>
+      <a href="#" class="sidebar-item" data-filter="trash">
+        <i class="fas fa-trash-alt w-4"></i><span>Trash</span>
+      </a>
+    </nav>
+
+    <!-- Labels -->
+    <div class="mt-6">
+      <p class="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-widest">Labels</p>
+      <div id="labelsList" class="space-y-0.5"></div>
+      <button id="addLabelBtn"
+        class="mt-2 px-3 py-2 text-xs text-sky-400 hover:text-sky-300 flex items-center gap-2 transition-colors">
+        <i class="fas fa-plus"></i> Add Label
+      </button>
+      <button id="clearLabelsBtn"
+        class="px-3 py-1 text-xs text-red-400 hover:text-red-300 flex items-center gap-2 transition-colors">
+        <i class="fas fa-times"></i> Clear All
+      </button>
     </div>
 
-    <!-- Toast for undo delete -->
-    <div id="toast" class="fixed bottom-4 right-4 glass rounded-xl p-4 shadow-lg hidden toast">
-        <div class="flex items-center">
-            <i class="fas fa-trash-restore text-teal-500 mr-3"></i>
-            <span>Note moved to trash.</span>
-            <button id="undoDelete" class="ml-4 text-teal-500 font-semibold">Undo</button>
-            <button id="closeToast" class="ml-4 text-gray-500" title="Close toast">
-                <i class="fas fa-times"></i>
-            </button>
+    <!-- ── Quick stats (FIX: missing elements added) ── -->
+    <div class="mt-6 mx-2 glass rounded-xl p-3">
+      <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">Quick Stats</p>
+      <div class="grid grid-cols-3 gap-1">
+        <div class="quick-stat">
+          <div class="val" id="totalNotesCount">0</div>
+          <div class="lbl">Notes</div>
         </div>
+        <div class="quick-stat">
+          <div class="val" id="tasksCountToday">0</div>
+          <div class="lbl">Today</div>
+        </div>
+        <div class="quick-stat">
+          <div class="val" id="completedTodayCount">0</div>
+          <div class="lbl">Done</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <main class="flex-1 p-4 md:p-6 min-w-0">
+
+    <!-- Tab nav -->
+    <div class="flex items-center gap-1 mb-6 pb-4 border-b border-white/8 overflow-x-auto">
+      <button class="tab-btn active" data-tab="notes">
+        <i class="fas fa-sticky-note mr-1.5"></i><span class="tab-text">Notes</span>
+      </button>
+      <button class="tab-btn" data-tab="tasks">
+        <i class="fas fa-list-check mr-1.5"></i><span class="tab-text">Tasks</span>
+      </button>
+      <button class="tab-btn" data-tab="stats">
+        <i class="fas fa-chart-line mr-1.5"></i><span class="tab-text">Stats</span>
+      </button>
+      <button class="tab-btn" data-tab="trash">
+        <i class="fas fa-trash-alt mr-1.5"></i><span class="tab-text">Trash</span>
+      </button>
     </div>
 
-    <!-- Scripts -->
-    <script>
-        // JavaScript will be added in the next step
-        console.log('Ashvinz Notes loaded');
-
-        // Header functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // ===== TAB NAVIGATION =====
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const tabName = btn.dataset.tab;
-                    tabBtns.forEach(b => b.classList.remove('active'));
-                    tabContents.forEach(t => t.classList.add('hidden'));
-                    btn.classList.add('active');
-                    document.getElementById(tabName + 'Tab').classList.remove('hidden');
-                    
-                    // Refresh stats when viewing stats tab
-                    if (tabName === 'stats') {
-                        updateStatistics();
-                    }
-                });
-            });
-
-            // Background animation setup
-            const backgroundAnimation = document.getElementById('backgroundAnimation');
-            function setupBackgroundAnimation() {
-                backgroundAnimation.innerHTML = '';
-                for (let i = 0; i < 3; i++) {
-                    const wave = document.createElement('div');
-                    wave.className = 'bg-wave';
-                    wave.style.animationDelay = `${i * 2}s`;
-                    backgroundAnimation.appendChild(wave);
-                }
-                for (let i = 0; i < 8; i++) {
-                    const object = document.createElement('div');
-                    object.className = 'bg-object';
-                    const size = 30 + Math.random() * 38;
-                    object.style.width = `${size}px`;
-                    object.style.height = `${size}px`;
-                    object.style.left = `${Math.random() * 100}%`;
-                    object.style.top = `${Math.random() * 100}%`;
-                    object.style.animationDelay = `${Math.random() * 8}s`;
-                    object.style.animationDuration = `${14 + Math.random() * 14}s`;
-                    backgroundAnimation.appendChild(object);
-                }
-            }
-            setupBackgroundAnimation();
-
-            // Theme toggle
-            const themeToggle = document.getElementById('themeToggle');
-            const themeIcon = themeToggle.querySelector('i');
-            function updateBackgroundMode() {
-                if (document.body.classList.contains('neon')) {
-                    backgroundAnimation.classList.add('active');
-                } else {
-                    backgroundAnimation.classList.remove('active');
-                }
-            }
-            updateBackgroundMode();
-            
-            // Load saved theme from localStorage
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            if (savedTheme === 'light') {
-                document.documentElement.classList.remove('dark');
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                document.documentElement.classList.add('dark');
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
-            
-            themeToggle.addEventListener('click', () => {
-                const isDark = document.documentElement.classList.toggle('dark');
-                if (isDark) {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                    localStorage.setItem('theme', 'dark');
-                } else {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                    localStorage.setItem('theme', 'light');
-                }
-                updateBackgroundMode();
-            });
-
-            // Add neon toggle (if using separate mode button for glowing vibe)
-            const neonToggle = document.getElementById('neonToggle');
-            if (neonToggle) {
-                neonToggle.addEventListener('click', () => {
-                    document.body.classList.toggle('neon');
-                    updateBackgroundMode();
-                });
-            }
-
-            // Periodic update for subtle background color shift
-            setInterval(() => {
-                const angle = (Date.now() / 30000) % 360;
-                backgroundAnimation.style.background = `linear-gradient(${120 + angle}deg, rgba(5, 40, 50, 0.85), rgba(2, 2, 40, 0.7))`;
-            }, 5000);
-
-            // Canvas star + moon layer
-            const bgCanvas = document.getElementById('bgCanvas');
-            const ctx = bgCanvas.getContext('2d');
-
-            function resizeCanvas() {
-                bgCanvas.width = window.innerWidth;
-                bgCanvas.height = window.innerHeight;
-            }
-
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
-
-            const stars = [];
-            for (let i = 0; i < 250; i++) {
-                stars.push({
-                    x: Math.random() * bgCanvas.width,
-                    y: Math.random() * bgCanvas.height,
-                    speed: 0.04 + Math.random() * 0.25,
-                    radius: 0.4 + Math.random() * 1.2,
-                    phase: Math.random() * Math.PI * 2
-                });
-            }
-
-            const moon = {
-                x: bgCanvas.width * 0.8,
-                y: bgCanvas.height * 0.2,
-                radius: Math.min(bgCanvas.width, bgCanvas.height) * 0.08,
-                phase: 0
-            };
-
-            function renderBgScene() {
-                ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-
-                const cx = bgCanvas.width / 2;
-                const cy = bgCanvas.height / 2;
-
-                // draw starfield layer
-                stars.forEach(s => {
-                    s.x += s.speed;
-                    if (s.x > bgCanvas.width + 5) s.x = -5;
-                    s.phase += 0.03;
-                    const glow = 0.4 + Math.sin(s.phase) * 0.6;
-                    ctx.beginPath();
-                    ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(255,255,255,${glow})`;
-                    ctx.shadowBlur = s.radius * 1.6;
-                    ctx.shadowColor = `rgba(255,255,255,${glow})`;
-                    ctx.fill();
-                });
-
-                particles.forEach(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.z += p.vz;
-
-                    if (p.x < -100 || p.x > bgCanvas.width + 100 || p.y < -100 || p.y > bgCanvas.height + 100 || p.z < 100 || p.z > 1800) {
-                        p.x = Math.random() * bgCanvas.width;
-                        p.y = Math.random() * bgCanvas.height;
-                        p.z = Math.random() * 700 + 120;
-                        p.vx = (Math.random() - 0.5) * (p.type === 'animal' ? 0.2 : 0.4);
-                        p.vy = (Math.random() - 0.5) * (p.type === 'animal' ? 0.2 : 0.4);
-                        p.vz = (Math.random() - 0.5) * (p.type === 'animal' ? 1.1 : 1.5);
-                    }
-
-                    const scale = 800 / p.z;
-                    const x = cx + (p.x - cx) * scale;
-                    const y = cy + (p.y - cy) * scale;
-                    const r = p.radius * scale;
-                    const opacity = Math.max(0.2, Math.min(0.85, (1800 - p.z) / 1800));
-
-                    if (p.type === 'animal') {
-                        ctx.font = `${Math.max(14, r * 1.8)}px serif`;
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillStyle = `rgba(255,255,255,${opacity})`;
-                        ctx.shadowColor = `rgba(255,255,255,${Math.min(0.8, opacity)})`;
-                        ctx.shadowBlur = r * 0.7;
-                        ctx.fillText(p.icon, x, y);
-                    } else {
-                        ctx.beginPath();
-                        ctx.arc(x, y, r, 0, Math.PI * 2);
-                        ctx.fillStyle = `hsla(${p.hue}, 85%, 66%, ${opacity})`;
-                        ctx.shadowColor = `hsla(${p.hue}, 85%, 85%, ${opacity * 0.8})`;
-                        ctx.shadowBlur = r * 1.5;
-                        ctx.fill();
-                    }
-                });
-
-                requestAnimationFrame(renderBgScene);
-            }
-
-            renderBgScene();
-
-            // Mobile menu toggle
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const sidebar = document.querySelector('aside');
-            const mobileSearchBtn = document.getElementById('mobileSearchBtn');
-            const searchInput = document.getElementById('searchInput');
-            
-            mobileMenuBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('hidden');
-                // Toggle mobile overlay backdrop
-                const backdrop = document.getElementById('mobileBackdrop');
-                if (!sidebar.classList.contains('hidden')) {
-                    sidebar.classList.add('fixed', 'inset-y-0', 'left-0', 'z-40', 'w-64', 'shadow-xl');
-                    if (!backdrop) {
-                        const newBackdrop = document.createElement('div');
-                        newBackdrop.id = 'mobileBackdrop';
-                        newBackdrop.className = 'fixed inset-0 z-30 bg-black bg-opacity-50 md:hidden';
-                        newBackdrop.addEventListener('click', () => {
-                            sidebar.classList.add('hidden');
-                            newBackdrop.remove();
-                        });
-                        document.body.appendChild(newBackdrop);
-                    }
-                } else {
-                    sidebar.classList.remove('fixed', 'inset-y-0', 'left-0', 'z-40', 'w-64', 'shadow-xl');
-                    if (backdrop) backdrop.remove();
-                }
-            });
-
-            // Mobile search button - focus search input
-            mobileSearchBtn.addEventListener('click', () => {
-                searchInput.focus();
-            });
-
-            // View toggle (grid/list)
-            const viewToggle = document.getElementById('viewToggle');
-            const viewIcon = viewToggle.querySelector('i');
-            const notesContainer = document.getElementById('notesContainer');
-            
-            viewToggle.addEventListener('click', () => {
-                notesContainer.parentElement.classList.toggle('list-view');
-                if (notesContainer.parentElement.classList.contains('list-view')) {
-                    viewIcon.classList.remove('fa-th-large');
-                    viewIcon.classList.add('fa-list');
-                } else {
-                    viewIcon.classList.remove('fa-list');
-                    viewIcon.classList.add('fa-th-large');
-                }
-            });
-
-            // Search functionality
-            searchInput.addEventListener('input', function() {
-                searchQuery = this.value.toLowerCase();
-                renderNotes();
-            });
-
-            // Settings button
-            const settingsModal = document.getElementById('settingsModal');
-            const closeSettings = document.getElementById('closeSettings');
-            const saveSettings = document.getElementById('saveSettings');
-            const settingAll = document.getElementById('settingAll');
-            const settingReminders = document.getElementById('settingReminders');
-            const settingLabels = document.getElementById('settingLabels');
-            const settingArchive = document.getElementById('settingArchive');
-            const settingTrash = document.getElementById('settingTrash');
-            const settingBgObject = document.getElementById('settingBgObject');
-            const themeModeSelect = document.createElement('select');
-
-            themeModeSelect.id = 'themeMode';
-            themeModeSelect.className = 'w-full py-2 px-3 rounded';
-            themeModeSelect.innerHTML = `
-                <option value="default">Default</option>
-                <option value="neon">Neon</option>
-                <option value="pink">Pink</option>
-                <option value="forest">Forest</option>
-                <option value="twilight">Twilight</option>
-                <option value="cobalt">Cobalt</option>
-                <option value="sunset">Sunset</option>
-                <option value="mint">Mint</option>
-                <option value="eclipse">Eclipse</option>
-                <option value="coral">Coral</option>
-                <option value="ocean">Ocean</option>
-                <option value="lavender">Lavender</option>
-                <option value="ember">Ember</option>
-            `;
-
-            const themeLabel = document.createElement('label');
-            themeLabel.className = 'flex flex-col text-sm gap-2';
-            themeLabel.innerHTML = '<span>Theme Mode</span>';
-            themeLabel.appendChild(themeModeSelect);
-            settingsModal.querySelector('.space-y-3').appendChild(themeLabel);
-
-            const applyThemeMode = () => {
-                document.body.classList.remove('neon', 'pink', 'forest', 'twilight', 'cobalt', 'sunset', 'mint', 'eclipse', 'coral', 'ocean', 'lavender', 'ember');
-                const mode = localStorage.getItem('themeMode') || 'default';
-                if (mode === 'neon') document.body.classList.add('neon');
-                if (mode === 'pink') document.body.classList.add('pink');
-                if (mode === 'forest') document.body.classList.add('forest');
-                if (mode === 'twilight') document.body.classList.add('twilight');
-                if (mode === 'cobalt') document.body.classList.add('cobalt');
-                if (mode === 'sunset') document.body.classList.add('sunset');
-                if (mode === 'mint') document.body.classList.add('mint');
-                if (mode === 'eclipse') document.body.classList.add('eclipse');
-                if (mode === 'coral') document.body.classList.add('coral');
-                if (mode === 'ocean') document.body.classList.add('ocean');
-                if (mode === 'lavender') document.body.classList.add('lavender');
-                if (mode === 'ember') document.body.classList.add('ember');
-                themeModeSelect.value = mode;
-            };
-
-            document.getElementById('settingsBtn').addEventListener('click', () => {
-                settingsModal.classList.remove('hidden');
-                applyThemeMode();
-            });
-            closeSettings.addEventListener('click', () => settingsModal.classList.add('hidden'));
-
-            saveSettings.addEventListener('click', () => {
-                localStorage.setItem('settingAll', settingAll.checked);
-                localStorage.setItem('settingReminders', settingReminders.checked);
-                localStorage.setItem('settingLabels', settingLabels.checked);
-                localStorage.setItem('settingArchive', settingArchive.checked);
-                localStorage.setItem('settingTrash', settingTrash.checked);
-                localStorage.setItem('settingBgObject', settingBgObject.checked);
-                localStorage.setItem('themeMode', themeModeSelect.value);
-                applyThemeMode();
-                settingsModal.classList.add('hidden');
-            });
-
-            if (localStorage.getItem('settingBgObject') === 'false') {
-                backgroundAnimation.style.display = 'none';
-            } else {
-                backgroundAnimation.style.display = 'block';
-            }
-
-            if (localStorage.getItem('themeMode')) applyThemeMode();
-
-            // Sidebar navigation
-            let currentFilter = 'all'; // Track current filter
-            const sidebarItems = document.querySelectorAll('.sidebar-item');
-            sidebarItems.forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    sidebarItems.forEach(i => i.classList.remove('active'));
-                    item.classList.add('active');
-                    const filter = item.dataset.filter;
-                    currentFilter = filter;
-                    activeLabel = null; // Reset label filter when using main categories
-                    renderNotes(); // Apply the filter
-                });
-            });
-
-            // Labels management
-            const labelsList = document.getElementById('labelsList');
-            const addLabelBtn = document.getElementById('addLabelBtn');
-            const clearLabelsBtn = document.createElement('button');
-            let labels = JSON.parse(localStorage.getItem('labels')) || [];
-
-            clearLabelsBtn.className = 'text-red-500 hover:text-red-700 text-sm mt-2';
-            clearLabelsBtn.textContent = 'Clear All Labels';
-            clearLabelsBtn.addEventListener('click', () => {
-                if (confirm('Remove all labels? This will also clear labels on notes.')) {
-                    labels = [];
-                    notes.forEach(note => note.labels = []);
-                    localStorage.setItem('labels', JSON.stringify(labels));
-                    saveNotes();
-                    renderLabels();
-                    renderNotes();
-                }
-            });
-            document.getElementById('labelsList').parentElement.appendChild(clearLabelsBtn);
-
-            function renderLabels() {
-                labelsList.innerHTML = '';
-                labels.forEach(label => {
-                    const labelEl = document.createElement('div');
-                    labelEl.className = 'flex items-center justify-between group';
-                    labelEl.innerHTML = `
-                        <a href="#" class="flex items-center text-gray-700 dark:text-gray-300 hover:text-teal-500" data-label-name="${label}">
-                            <i class="fas fa-tag text-xs mr-2"></i>
-                            <span>${label}</span>
-                        </a>
-                        <button class="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition" data-label-delete="${label}" title="Delete label">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    `;
-                    labelsList.appendChild(labelEl);
-                });
-
-                // Attach label click events
-                labelsList.querySelectorAll('[data-label-name]').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        activeLabel = el.dataset.labelName;
-                        currentFilter = 'all';
-                        document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-                        document.querySelector('[data-filter="all"]').classList.add('active');
-                        renderNotes();
-                    });
-                });
-
-                // Attach delete events
-                labelsList.querySelectorAll('[data-label-delete]').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const labelToDelete = btn.dataset.labelDelete;
-                        if (confirm(`Delete label "${labelToDelete}"?`)) {
-                            labels = labels.filter(l => l !== labelToDelete);
-                            localStorage.setItem('labels', JSON.stringify(labels));
-
-                            // remove label from all notes
-                            notes.forEach(note => {
-                                if (note.labels && note.labels.includes(labelToDelete)) {
-                                    note.labels = note.labels.filter(l => l !== labelToDelete);
-                                }
-                            });
-                            saveNotes();
-
-                            if (activeLabel === labelToDelete) {
-                                activeLabel = null;
-                            }
-                            renderLabels();
-                            renderNotes();
-                        }
-                    });
-                });
-            }
-
-            addLabelBtn.addEventListener('click', () => {
-                const labelName = prompt('Enter new label name:');
-                if (labelName && labelName.trim()) {
-                    const trimmed = labelName.trim();
-                    if (!labels.includes(trimmed)) {
-                        labels.push(trimmed);
-                        localStorage.setItem('labels', JSON.stringify(labels));
-                        renderLabels();
-                    } else {
-                        alert('Label already exists.');
-                    }
-                }
-            });
-
-            // Initial render
-            renderLabels();
-
-            // Note Data Model
-            let notes = JSON.parse(localStorage.getItem('notes')) || [];
-            let currentNoteId = null;
-            let activeLabel = null;
-            let searchQuery = '';
-            // notesContainer already declared earlier
-            const emptyState = document.getElementById('emptyState');
-            const quickTitle = document.getElementById('quickTitle');
-            const quickAddBtn = document.getElementById('quickAddBtn');
-            const noteModal = document.getElementById('noteModal');
-            const closeModal = document.getElementById('closeModal');
-            const modalTitle = document.getElementById('modalTitle');
-            const modalContent = document.getElementById('modalContent');
-            const modalLabels = document.getElementById('modalLabels');
-            const saveNote = document.getElementById('saveNote');
-            
-            // Modal toolbar actions
-            function getEditNote() {
-                return notes.find(n => n.id === currentNoteId);
-            }
-
-            function setupModalToolbarActions() {
-                const textBtn = noteModal.querySelector('.fa-font')?.closest('button');
-                const checklistBtn = noteModal.querySelector('.fa-list-check')?.closest('button');
-                const imageBtn = noteModal.querySelector('.fa-image')?.closest('button');
-                const reminderBtn = noteModal.querySelector('.fa-bell')?.closest('button');
-                const paletteBtn = noteModal.querySelector('.fa-palette')?.closest('button');
-                const tagBtn = noteModal.querySelector('.fa-tag')?.closest('button');
-
-                if (textBtn) {
-                    textBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        alert('Text formatting is coming soon. For now edit directly in the note content.');
-                    };
-                }
-                if (checklistBtn) {
-                    checklistBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        const note = getEditNote();
-                        if (!note) return;
-                        const item = prompt('Add checklist item:');
-                        if (item && item.trim()) {
-                            note.checklist = note.checklist || [];
-                            note.checklist.push({ text: item.trim(), checked: false });
-                            note.updatedAt = new Date().toISOString();
-                            saveNotes(); renderNotes();
-                            openEditModal(note.id);
-                        }
-                    };
-                }
-                if (imageBtn) {
-                    imageBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        const note = getEditNote();
-                        if (!note) return;
-                        const imageUrl = prompt('Paste image URL to embed:');
-                        if (imageUrl && imageUrl.trim()) {
-                            note.content = (note.content || '') + `\n![image](${imageUrl.trim()})`;
-                            note.updatedAt = new Date().toISOString();
-                            saveNotes(); renderNotes();
-                            openEditModal(note.id);
-                        }
-                    };
-                }
-                if (reminderBtn) {
-                    reminderBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        const note = getEditNote();
-                        if (!note) return;
-                        const date = prompt('Set reminder date/time (YYYY-MM-DD HH:MM):');
-                        if (!date) return;
-                        const reminder = new Date(date);
-                        if (!isNaN(reminder)) {
-                            note.reminder = reminder.toISOString();
-                            note.updatedAt = new Date().toISOString();
-                            saveNotes(); renderNotes();
-                            openEditModal(note.id);
-                        } else {
-                            alert('Invalid date format.');
-                        }
-                    };
-                }
-                if (paletteBtn) {
-                    paletteBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        const note = getEditNote();
-                        if (!note) return;
-                        showColorPicker(note);
-                    };
-                }
-                if (tagBtn) {
-                    tagBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        const note = getEditNote();
-                        if (!note) return;
-                        const label = prompt('Add label to note:');
-                        if (label && label.trim()) {
-                            const normalized = label.trim();
-                            note.labels = note.labels || [];
-                            if (!note.labels.includes(normalized)) note.labels.push(normalized);
-                            if (!labels.includes(normalized)) {
-                                labels.push(normalized);
-                                localStorage.setItem('labels', JSON.stringify(labels));
-                                renderLabels();
-                            }
-                            note.updatedAt = new Date().toISOString();
-                            saveNotes(); renderNotes();
-                            openEditModal(note.id);
-                        }
-                    };
-                }
-            }
-
-            setupModalToolbarActions();
-
-
-            // Generate unique ID
-            function generateId() {
-                return Date.now().toString(36) + Math.random().toString(36).substr(2);
-            }
-
-            // Format date
-            function formatDate(date) {
-                const now = new Date();
-                const diff = now - date;
-                const minutes = Math.floor(diff / 60000);
-                const hours = Math.floor(diff / 3600000);
-                const days = Math.floor(diff / 86400000);
-                if (minutes < 1) return 'Just now';
-                if (minutes < 60) return `${minutes}m ago`;
-                if (hours < 24) return `${hours}h ago`;
-                if (days < 7) return `${days}d ago`;
-                return date.toLocaleDateString();
-            }
-
-            // Render a single note card
-            function renderNoteCard(note) {
-                const card = document.createElement('div');
-                card.className = 'note-card glass rounded-xl p-4 mb-4 break-inside-avoid';
-                card.style.backgroundColor = note.color || '#ffffff';
-                card.dataset.id = note.id;
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-lg">${note.title || 'Untitled'}</h3>
-                        <button class="text-gray-500 hover:text-gray-800" title="${note.pinned ? 'Unpin' : 'Pin'}" data-action="pin">
-                            <i class="fas fa-thumbtack ${note.pinned ? 'text-teal-500' : ''}"></i>
-                        </button>
-                    </div>
-                    ${note.labels && note.labels.length > 0 ? `
-                        <div class="mt-2 flex flex-wrap gap-1">
-                            ${note.labels.map(label => `<span class="text-xs bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-200 px-2 py-1 rounded-full">${label}</span>`).join('')}
-                        </div>
-                    ` : ''}
-                    <p class="mt-2">${note.content || ''}</p>
-                    ${note.checklist && note.checklist.length > 0 ? `
-                        <div class="mt-3 space-y-1">
-                            ${note.checklist.map(item => `
-                                <div class="flex items-center">
-                                    <input type="checkbox" ${item.checked ? 'checked' : ''} disabled class="mr-2">
-                                    <span class="${item.checked ? 'line-through text-gray-500' : ''}">${item.text}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-                    <div class="mt-4 flex justify-between items-center">
-                        <span class="text-xs text-gray-500">${formatDate(new Date(note.updatedAt))}</span>
-                        <div class="flex space-x-2">
-                            <button class="text-gray-500 hover:text-teal-500" title="Change color" data-action="color" data-id="${note.id}"><i class="fas fa-palette"></i></button>
-                            <button class="text-gray-500 hover:text-teal-500" title="Archive note" data-action="archive"><i class="fas fa-archive"></i></button>
-                            <button class="text-gray-500 hover:text-red-500" title="Delete note" data-action="trash"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>
-                `;
-                // Add click to edit
-                card.addEventListener('click', (e) => {
-                    if (!e.target.closest('button')) {
-                        openEditModal(note.id);
-                    }
-                });
-                // Add button events
-                card.querySelectorAll('[data-action]').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const action = btn.dataset.action;
-                        handleNoteAction(note.id, action);
-                    });
-                });
-                return card;
-            }
-
-            // Render all notes
-            function renderNotes() {
-                notesContainer.innerHTML = '';
-                if (notes.length === 0) {
-                    emptyState.classList.remove('hidden');
-                    return;
-                }
-                emptyState.classList.add('hidden');
-                // Filter notes based on current filter
-                let filtered = notes.filter(note => {
-                    // Apply current filter (all, reminders, labels, archive, trash)
-                    switch(currentFilter) {
-                        case 'all':
-                            return !note.trashed && !note.archived;
-                        case 'reminders':
-                            return !note.trashed && note.reminder !== null && note.reminder !== undefined;
-                        case 'labels':
-                            return !note.trashed && !note.archived && (note.labels || []).length > 0;
-                        case 'archive':
-                            return !note.trashed && note.archived;
-                        case 'trash':
-                            return note.trashed;
-                        default:
-                            return !note.trashed && !note.archived;
-                    }
-                });
-                
-                // Further filter by active label (if set)
-                if (activeLabel) {
-                    filtered = filtered.filter(note => note.labels.includes(activeLabel));
-                }
-                
-                // Filter by search query
-                if (searchQuery) {
-                    const query = searchQuery.toLowerCase();
-                    filtered = filtered.filter(note => {
-                        const title = (note.title || '').toLowerCase();
-                        const content = (note.content || '').toLowerCase();
-                        const labels = note.labels.join(' ').toLowerCase();
-                        return title.includes(query) || content.includes(query) || labels.includes(query);
-                    });
-                }
-                
-                // Sort: pinned first, then by date
-                const sorted = filtered.sort((a, b) => (b.pinned - a.pinned) || (new Date(b.updatedAt) - new Date(a.updatedAt)));
-                sorted.forEach(note => {
-                    notesContainer.appendChild(renderNoteCard(note));
-                });
-            }
-
-            // Handle note actions
-            function handleNoteAction(id, action) {
-                const note = notes.find(n => n.id === id);
-                if (!note) return;
-                switch (action) {
-                    case 'pin':
-                        note.pinned = !note.pinned;
-                        break;
-                    case 'archive':
-                        note.archived = !note.archived;
-                        break;
-                    case 'trash':
-                        moveToTrash(id);
-                        showUndoToast(id);
-                        return;
-                    case 'color':
-                        showColorPicker(note);
-                        return; // don't save/rerender yet, color picker will handle
-                }
-                note.updatedAt = new Date().toISOString();
-                saveNotes();
-                renderNotes();
-            }
-
-            // Color picker
-            const colorPalette = [
-                '#ffffff', '#fecaca', '#fed7aa', '#fef08a', '#bbf7d0', '#bfdbfe', '#e9d5ff',
-                '#fbcfe8', '#d1d5db', '#9ca3af', '#6b7280', '#1f2937'
-            ];
-            function showColorPicker(note) {
-                // Create popup
-                const popup = document.createElement('div');
-                popup.className = 'absolute glass rounded-xl p-3 shadow-2xl z-50';
-                popup.innerHTML = `
-                    <div class="flex flex-wrap gap-2">
-                        ${colorPalette.map(color => `
-                            <div class="color-dot ${color === note.color ? 'active' : ''}"
-                                 style="background-color: ${color};"
-                                 data-color="${color}"
-                                 title="Select color">
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                // Position near the color button (simplified)
-                const btn = document.querySelector(`[data-action="color"][data-id="${note.id}"]`);
-                if (btn) {
-                    const rect = btn.getBoundingClientRect();
-                    popup.style.position = 'fixed';
-                    popup.style.left = rect.left + 'px';
-                    popup.style.top = rect.bottom + 10 + 'px';
-                } else {
-                    popup.style.position = 'fixed';
-                    popup.style.left = '50%';
-                    popup.style.top = '50%';
-                    popup.style.transform = 'translate(-50%, -50%)';
-                }
-                document.body.appendChild(popup);
-                // Handle color selection
-                popup.querySelectorAll('.color-dot').forEach(dot => {
-                    dot.addEventListener('click', () => {
-                        const color = dot.dataset.color;
-                        note.color = color;
-                        note.updatedAt = new Date().toISOString();
-                        saveNotes();
-                        renderNotes();
-                        document.body.removeChild(popup);
-                    });
-                });
-                // Close on click outside
-                setTimeout(() => {
-                    const closeHandler = (e) => {
-                        if (!popup.contains(e.target) && e.target !== btn) {
-                            document.body.removeChild(popup);
-                            document.removeEventListener('click', closeHandler);
-                        }
-                    };
-                    document.addEventListener('click', closeHandler);
-                }, 0);
-            }
-
-            // Create a new note
-            function createNote(title, content, type = 'text') {
-                const note = {
-                    id: generateId(),
-                    title,
-                    content,
-                    type,
-                    color: '#ffffff',
-                    pinned: false,
-                    archived: false,
-                    trashed: false,
-                    labels: [],
-                    checklist: type === 'checklist' ? [{ text: 'Task 1', checked: false }] : [],
-                    reminder: null,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
-                notes.push(note);
-                saveNotes();
-                renderNotes();
-                return note;
-            }
-
-            // Save notes to localStorage
-            function saveNotes() {
-                localStorage.setItem('notes', JSON.stringify(notes));
-            }
-
-            // Open edit modal
-            function openEditModal(id) {
-                const note = notes.find(n => n.id === id);
-                if (!note) return;
-                currentNoteId = id;
-                modalTitle.value = note.title || '';
-                modalContent.value = note.content || '';
-                modalLabels.value = (note.labels || []).join(', ');
-
-                // Reset modal animation classes to ensure re-opening works
-                noteModal.classList.remove('modal-enter');
-                noteModal.classList.remove('hidden');
-
-                setTimeout(() => noteModal.classList.add('modal-enter'), 10);
-            }
-
-            // Close edit modal
-            function closeEditModal() {
-                noteModal.classList.add('hidden');
-                currentNoteId = null;
-            }
-
-            // Show generic toast notification
-            function showToast(message, iconClass = 'fas fa-info-circle text-teal-500 mr-3', duration = 3000) {
-                const toast = document.getElementById('toast');
-                const toastIcon = toast.querySelector('i');
-                const toastText = toast.querySelector('span');
-                const undoBtn = document.getElementById('undoDelete');
-                const closeToast = document.getElementById('closeToast');
-                
-                // Hide undo button for generic toasts
-                undoBtn.classList.add('hidden');
-                
-                // Set content
-                toastIcon.className = iconClass;
-                toastText.textContent = message;
-                
-                // Show toast
-                toast.classList.remove('hidden');
-                
-                // Auto-hide after duration
-                setTimeout(() => toast.classList.add('hidden'), duration);
-                
-                // Close button functionality
-                closeToast.onclick = () => toast.classList.add('hidden');
-            }
-
-            // Show undo delete toast
-            function showUndoToast(id) {
-                const toast = document.getElementById('toast');
-                const toastIcon = toast.querySelector('i');
-                const toastText = toast.querySelector('span');
-                const undoBtn = document.getElementById('undoDelete');
-                const closeToast = document.getElementById('closeToast');
-                
-                // Show undo button
-                undoBtn.classList.remove('hidden');
-                
-                // Set undo delete specific content
-                toastIcon.className = 'fas fa-trash-restore text-teal-500 mr-3';
-                toastText.textContent = 'Note moved to trash.';
-                
-                // Show toast
-                toast.classList.remove('hidden');
-                
-                // Set up undo functionality
-                undoBtn.onclick = () => {
-                    const trashItem = trash.find(t => t.id === id);
-                    if (trashItem) {
-                        notes.push({...trashItem, trashed: false});
-                        trash = trash.filter(t => t.id !== id);
-                        saveNotes();
-                        saveTrash();
-                        renderNotes();
-                        renderTrash();
-                        toast.classList.add('hidden');
-                    }
-                };
-                
-                // Close button functionality
-                closeToast.onclick = () => toast.classList.add('hidden');
-                
-                // Auto-hide after 5 seconds
-                setTimeout(() => toast.classList.add('hidden'), 5000);
-            }
-
-            // Export notes as JSON file
-            function exportNotes() {
-                const dataStr = JSON.stringify(notes, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(dataBlob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `ashvinz-notes-${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                // Show success notification
-                showToast('Notes exported successfully!', 'fas fa-file-export text-teal-500 mr-3');
-            }
-
-            // Import notes from JSON file
-            function importNotes() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json,application/json';
-                input.onchange = (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-                    
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        try {
-                            const importedNotes = JSON.parse(event.target.result);
-                            
-                            // Validate imported notes structure
-                            if (!Array.isArray(importedNotes)) {
-                                throw new Error('Invalid JSON format: expected an array of notes');
-                            }
-                            
-                            // Basic validation for each note
-                            const validNotes = importedNotes.filter(note =>
-                                note && typeof note === 'object' &&
-                                (note.title || note.content)
-                            );
-                            
-                            if (validNotes.length === 0) {
-                                throw new Error('No valid notes found in the file');
-                            }
-                            
-                            // Merge imported notes with existing notes
-                            // Avoid duplicates by checking IDs
-                            const existingIds = new Set(notes.map(n => n.id));
-                            const newNotes = validNotes.filter(note => !existingIds.has(note.id));
-                            
-                            // Add imported notes to the beginning of the array
-                            notes.unshift(...newNotes);
-                            saveNotes();
-                            renderNotes();
-                            
-                            // Show success notification
-                            showToast(`Imported ${newNotes.length} notes successfully!`, 'fas fa-file-import text-teal-500 mr-3');
-                            
-                        } catch (error) {
-                            alert(`Import failed: ${error.message}`);
-                        }
-                    };
-                    reader.readAsText(file);
-                };
-                input.click();
-            }
-
-            // Event listeners
-            quickAddBtn.addEventListener('click', () => {
-                const title = quickTitle.value.trim();
-                if (title) {
-                    createNote(title, '', 'text');
-                    quickTitle.value = '';
-                }
-            });
-
-            quickTitle.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    quickAddBtn.click();
-                }
-            });
-
-            noteModal.addEventListener('click', (e) => {
-                if (e.target === noteModal) {
-                    closeEditModal();
-                }
-            });
-            closeModal.addEventListener('click', closeEditModal);
-
-            saveNote.addEventListener('click', () => {
-                if (currentNoteId) {
-                    const note = notes.find(n => n.id === currentNoteId);
-                    if (note) {
-                        note.title = modalTitle.value;
-                        note.content = modalContent.value;
-                        note.labels = modalLabels.value.split(',').map(l => l.trim()).filter(l => l);
-                        note.updatedAt = new Date().toISOString();
-                        saveNotes();
-                        renderNotes();
-                        renderLabels();
-                    }
-                }
-                closeEditModal();
-            });
-
-            // Export/Import buttons
-            document.getElementById('exportBtn').addEventListener('click', exportNotes);
-            document.getElementById('importBtn').addEventListener('click', importNotes);
-
-            // Auto-save functionality
-            function debounce(func, wait) {
-                let timeout;
-                return function executedFunction(...args) {
-                    const later = () => {
-                        clearTimeout(timeout);
-                        func(...args);
-                    };
-                    clearTimeout(timeout);
-                    timeout = setTimeout(later, wait);
-                };
-            }
-
-            function autoSaveNote() {
-                if (currentNoteId) {
-                    const note = notes.find(n => n.id === currentNoteId);
-                    if (note) {
-                        note.title = modalTitle.value;
-                        note.content = modalContent.value;
-                        note.updatedAt = new Date().toISOString();
-                        saveNotes();
-                        
-                        // Show auto-save indicator briefly
-                        const saveBtn = document.getElementById('saveNote');
-                        const originalText = saveBtn.textContent;
-                        saveBtn.textContent = 'Saved!';
-                        saveBtn.classList.remove('bg-teal-500', 'hover:bg-teal-600');
-                        saveBtn.classList.add('bg-green-500', 'hover:bg-green-600');
-                        setTimeout(() => {
-                            saveBtn.textContent = originalText;
-                            saveBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
-                            saveBtn.classList.add('bg-teal-500', 'hover:bg-teal-600');
-                        }, 1000);
-                    }
-                }
-            }
-
-            const debouncedAutoSave = debounce(autoSaveNote, 500);
-
-            // Attach auto-save to modal inputs
-            modalTitle.addEventListener('input', debouncedAutoSave);
-            modalContent.addEventListener('input', debouncedAutoSave);
-
-            // Initial render of notes
-            renderNotes();
-
-            // ===== DAILY TASKS FUNCTIONALITY =====
-            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-            const taskInput = document.getElementById('taskInput');
-            const addTaskBtn = document.getElementById('addTaskBtn');
-            const tasksContainer = document.getElementById('tasksContainer');
-            const emptyTasksState = document.getElementById('emptyTasksState');
-
-            function saveTasks() {
-                localStorage.setItem('tasks', JSON.stringify(tasks));
-                updateQuickStats();
-            }
-
-            function renderTasks() {
-                tasksContainer.innerHTML = '';
-                const sortedTasks = tasks.slice().sort((a, b) => new Date(b.date) - new Date(a.date));
-
-                if (sortedTasks.length === 0) {
-                    emptyTasksState.classList.remove('hidden');
-                    return;
-                }
-                emptyTasksState.classList.add('hidden');
-
-                sortedTasks.forEach(task => {
-                    const taskEl = document.createElement('div');
-                    taskEl.className = 'task-card glass rounded-xl p-4 flex items-center gap-4';
-                    taskEl.innerHTML = `
-                        <input type="checkbox" class="task-checkbox w-5 h-5 rounded cursor-pointer" ${task.completed ? 'checked' : ''} data-id="${task.id}">
-                        <span class="flex-1 text-lg ${task.completed ? 'line-through text-gray-500' : ''}">${task.text}</span>
-                        <small class="text-xs text-gray-500 dark:text-gray-400 ml-3">${new Date(task.date).toLocaleString()}</small>
-                        <button class="text-red-500 hover:text-red-700 delete-task" data-id="${task.id}" title="Delete task">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    `;
-                    tasksContainer.appendChild(taskEl);
-                });
-
-                // Add event listeners
-                document.querySelectorAll('.task-checkbox').forEach(cb => {
-                    cb.addEventListener('change', (e) => {
-                        const task = tasks.find(t => t.id === e.target.dataset.id);
-                        if (task) {
-                            task.completed = e.target.checked;
-                            saveTasks();
-                            renderTasks();
-                        }
-                    });
-                });
-
-                document.querySelectorAll('.delete-task').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = e.currentTarget.dataset.id;
-                        tasks = tasks.filter(t => t.id !== id);
-                        saveTasks();
-                        renderTasks();
-                    });
-                });
-            }
-
-            addTaskBtn.addEventListener('click', () => {
-                const text = taskInput.value.trim();
-                if (text) {
-                    tasks.push({
-                        id: generateId(),
-                        text,
-                        completed: false,
-                        date: new Date().toISOString()
-                    });
-                    taskInput.value = '';
-                    saveTasks();
-                    renderTasks();
-                }
-            });
-
-            taskInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') addTaskBtn.click();
-            });
-
-            renderTasks();
-
-            // ===== STATISTICS FUNCTIONALITY =====
-            function updateStatistics() {
-                const totalNotes = notes.length;
-                const completedTasks = tasks.filter(t => t.completed).length;
-                const completionRate = tasks.length > 0 ? Math.round((completedTasks / tasks.length) * 100) : 0;
-
-                document.getElementById('statTotalNotes').textContent = totalNotes;
-                document.getElementById('statTasksCompleted').textContent = completedTasks;
-                document.getElementById('statCompletionRate').textContent = completionRate + '%';
-
-                // Monthly chart (simple bar chart)
-                const monthlyData = new Array(12).fill(0);
-                notes.forEach(note => {
-                    const month = new Date(note.createdAt).getMonth();
-                    monthlyData[month]++;
-                });
-
-                renderMonthlyChart(monthlyData);
-                renderYearlyHeatmap();
-            }
-
-            function renderMonthlyChart(data) {
-                const canvas = document.getElementById('monthlyChart');
-                if (!canvas) return;
-                const ctx = canvas.getContext('2d');
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                const maxVal = Math.max(...data, 1);
-                const width = canvas.width;
-                const height = canvas.height;
-                const barWidth = width / 12;
-
-                ctx.clearRect(0, 0, width, height);
-                ctx.fillStyle = '#00BCD4';
-                ctx.font = '12px Arial';
-                ctx.fillStyle = '#999';
-                ctx.textAlign = 'center';
-
-                data.forEach((value, i) => {
-                    const barHeight = (value / maxVal) * (height - 30);
-                    const x = i * barWidth + barWidth / 4;
-                    const y = height - barHeight - 20;
-                    
-                    ctx.fillStyle = '#00BCD4';
-                    ctx.fillRect(x, y, barWidth / 2, barHeight);
-                    
-                    ctx.fillStyle = '#999';
-                    ctx.fillText(months[i], x + barWidth / 4, height - 5);
-                });
-            }
-
-            function renderYearlyHeatmap() {
-                const heatmap = document.getElementById('yearlyHeatmap');
-                if (!heatmap) return;
-                heatmap.innerHTML = '';
-                
-                const months = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
-                const monthlyTasks = new Array(12).fill(0);
-                tasks.forEach(task => {
-                    const month = new Date(task.date).getMonth();
-                    if (task.completed) monthlyTasks[month]++;
-                });
-
-                const maxVal = Math.max(...monthlyTasks, 1);
-                months.forEach((month, i) => {
-                    const intensity = monthlyTasks[i] / maxVal;
-                    const color = `rgba(0, 188, 212, ${0.2 + intensity * 0.8})`;
-                    const cell = document.createElement('div');
-                    cell.className = 'w-full aspect-square rounded-lg border border-gray-300 dark:border-gray-600 flex items-center justify-center font-bold text-sm cursor-help stat-card';
-                    cell.style.backgroundColor = color;
-                    cell.textContent = month;
-                    cell.title = `${monthlyTasks[i]} tasks completed in ${month}`;
-                    heatmap.appendChild(cell);
-                });
-            }
-
-            // ===== TRASH FUNCTIONALITY =====
-            let trash = JSON.parse(localStorage.getItem('trash')) || [];
-            const trashContainer = document.getElementById('trashContainer');
-            const emptyTrashState = document.getElementById('emptyTrashState');
-            const emptyTrashBtn = document.getElementById('emptyTrashBtn');
-            const restoreAllBtn = document.getElementById('restoreAllBtn');
-
-            function saveTrash() {
-                localStorage.setItem('trash', JSON.stringify(trash));
-            }
-
-            function moveToTrash(noteId) {
-                const note = notes.find(n => n.id === noteId);
-                if (note) {
-                    note.trashed = true;
-                    note.updatedAt = new Date().toISOString();
-
-                    if (!trash.find(t => t.id === noteId)) {
-                        trash.push({...note, deletedAt: new Date().toISOString()});
-                    }
-
-                    saveNotes();
-                    saveTrash();
-                    renderNotes();
-                    renderTrash();
-                }
-            }
-
-            function renderTrash() {
-                trashContainer.innerHTML = '';
-                if (trash.length === 0) {
-                    emptyTrashState.classList.remove('hidden');
-                    return;
-                }
-                emptyTrashState.classList.add('hidden');
-
-                trash.forEach(item => {
-                    const trashItem = document.createElement('div');
-                    trashItem.className = 'trash-item glass rounded-xl p-4 fade-in-scale';
-                    trashItem.innerHTML = `
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-bold text-lg">${item.title || 'Untitled'}</h3>
-                            <span class="text-xs text-gray-500">Deleted ${formatDate(new Date(item.deletedAt))}</span>
-                        </div>
-                        <p class="mt-2 text-sm">${(item.content || '').substring(0, 100)}...</p>
-                        <div class="mt-4 flex gap-2 justify-end">
-                            <button class="restore-item text-teal-500 hover:text-teal-700 px-3 py-1 rounded" data-id="${item.id}">
-                                <i class="fas fa-undo mr-1"></i>Restore
-                            </button>
-                            <button class="delete-forever text-red-500 hover:text-red-700 px-3 py-1 rounded" data-id="${item.id}">
-                                <i class="fas fa-trash mr-1"></i>Delete Forever
-                            </button>
-                        </div>
-                    `;
-                    trashContainer.appendChild(trashItem);
-                });
-
-                document.querySelectorAll('.restore-item').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = e.currentTarget.dataset.id;
-                        const item = trash.find(t => t.id === id);
-                        const note = notes.find(n => n.id === id);
-
-                        if (note) {
-                            note.trashed = false;
-                            note.updatedAt = new Date().toISOString();
-                        } else if (item) {
-                            notes.push({...item, trashed: false});
-                        }
-
-                        if (item) {
-                            trash = trash.filter(t => t.id !== id);
-                        }
-
-                        saveNotes();
-                        saveTrash();
-                        renderTrash();
-                        renderNotes();
-                        showToast('Note restored!', 'fas fa-undo text-teal-500 mr-3');
-                    });
-                });
-
-                document.querySelectorAll('.delete-forever').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const id = e.currentTarget.dataset.id;
-                        if (confirm('This will permanently delete the note. Continue?')) {
-                            trash = trash.filter(t => t.id !== id);
-                            notes = notes.filter(n => n.id !== id);
-                            saveNotes();
-                            saveTrash();
-                            renderTrash();
-                            renderNotes();
-                            showToast('Note permanently deleted', 'fas fa-trash text-red-500 mr-3');
-                        }
-                    });
-                });
-            }
-
-            emptyTrashBtn.addEventListener('click', () => {
-                if (confirm('Permanently delete all items in trash?')) {
-                    trash = [];
-                    saveTrash();
-                    renderTrash();
-                    showToast('Trash emptied', 'fas fa-trash text-red-500 mr-3');
-                }
-            });
-
-            restoreAllBtn.addEventListener('click', () => {
-                if (trash.length > 0) {
-                    notes.push(...trash);
-                    trash = [];
-                    saveNotes();
-                    saveTrash();
-                    renderTrash();
-                    renderNotes();
-                    showToast('All items restored!', 'fas fa-undo text-teal-500 mr-3');
-                }
-            });
-
-            renderTrash();
-
-            // ===== QUICK STATS UPDATE =====
-            function updateQuickStats() {
-                const totalNotes = notes.length;
-                const todayTasks = tasks.filter(t => {
-                    const taskDate = new Date(t.date).toDateString();
-                    const today = new Date().toDateString();
-                    return taskDate === today;
-                });
-                const completedToday = todayTasks.filter(t => t.completed).length;
-
-                document.getElementById('totalNotesCount').textContent = totalNotes;
-                document.getElementById('tasksCountToday').textContent = todayTasks.length;
-                document.getElementById('completedTodayCount').textContent = completedToday;
-            }
-
-            updateQuickStats();
-
-            // Update when creating a new note
-            const originalCreateNote = createNote;
-            createNote = function(title, content, type = 'text') {
-                const result = originalCreateNote.call(this, title, content, type);
-                updateQuickStats();
-                return result;
-            };
-        });
-    </script>
+    <!-- ── NOTES TAB ── -->
+    <div id="notesTab" class="tab-content">
+      <div class="glass rounded-xl p-4 mb-6 max-w-3xl mx-auto">
+        <div class="flex items-center gap-3">
+          <input id="quickTitle" type="text" placeholder="Create a new note…"
+            class="flex-1 bg-transparent border-none outline-none text-sm placeholder-slate-400">
+          <button id="quickAddBtn"
+            class="bg-sky-500 hover:bg-sky-400 text-white px-5 py-2 rounded-lg text-sm font-semibold">
+            Add
+          </button>
+        </div>
+      </div>
+
+      <div id="notesContainer" class="masonry-grid"></div>
+
+      <div id="emptyState" class="text-center py-16 hidden">
+        <i class="fas fa-sticky-note text-5xl text-slate-600 mb-4 block"></i>
+        <p class="text-slate-400 font-medium">No notes yet. Create one above!</p>
+      </div>
+    </div>
+
+    <!-- ── TASKS TAB ── -->
+    <div id="tasksTab" class="tab-content hidden">
+      <div class="glass rounded-xl p-4 mb-5">
+        <div class="flex items-center gap-3">
+          <input id="taskInput" type="text" placeholder="Add a new task…"
+            class="flex-1 bg-transparent border-none outline-none text-sm placeholder-slate-400">
+          <button id="addTaskBtn"
+            class="bg-sky-500 hover:bg-sky-400 text-white px-5 py-2 rounded-lg text-sm font-semibold">
+            Add
+          </button>
+        </div>
+      </div>
+      <div id="tasksContainer" class="space-y-3"></div>
+      <div id="emptyTasksState" class="text-center py-16">
+        <i class="fas fa-tasks text-5xl text-slate-600 mb-4 block"></i>
+        <p class="text-slate-400 font-medium">No tasks yet. Add one above!</p>
+      </div>
+    </div>
+
+    <!-- ── STATS TAB ── -->
+    <div id="statsTab" class="tab-content hidden">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+        <div class="stat-card glass rounded-xl p-5">
+          <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">Total Notes</p>
+          <p class="text-4xl font-bold text-sky-400" id="statTotalNotes">0</p>
+          <p class="text-xs text-slate-500 mt-1">All time</p>
+        </div>
+        <div class="stat-card glass rounded-xl p-5">
+          <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">Tasks Completed</p>
+          <p class="text-4xl font-bold text-emerald-400" id="statTasksCompleted">0</p>
+          <p class="text-xs text-slate-500 mt-1">All time</p>
+        </div>
+        <div class="stat-card glass rounded-xl p-5">
+          <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">Completion Rate</p>
+          <p class="text-4xl font-bold text-violet-400" id="statCompletionRate">0%</p>
+          <p class="text-xs text-slate-500 mt-1">All tasks</p>
+        </div>
+      </div>
+      <div class="glass rounded-xl p-5 mb-5">
+        <h3 class="font-bold mb-4 text-slate-200">Monthly Notes Created</h3>
+        <canvas id="monthlyChart" height="80"></canvas>
+      </div>
+      <div class="glass rounded-xl p-5">
+        <h3 class="font-bold mb-4 text-slate-200">Yearly Task Heatmap</h3>
+        <div class="grid grid-cols-4 md:grid-cols-12 gap-2" id="yearlyHeatmap"></div>
+      </div>
+    </div>
+
+    <!-- ── TRASH TAB ── -->
+    <div id="trashTab" class="tab-content hidden">
+      <div class="flex gap-3 mb-5">
+        <button id="emptyTrashBtn"
+          class="bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg text-sm font-semibold">
+          <i class="fas fa-trash mr-2"></i>Empty Trash
+        </button>
+        <button id="restoreAllBtn"
+          class="bg-sky-600 hover:bg-sky-500 text-white px-5 py-2 rounded-lg text-sm font-semibold">
+          <i class="fas fa-undo mr-2"></i>Restore All
+        </button>
+      </div>
+      <div id="trashContainer" class="space-y-3"></div>
+      <div id="emptyTrashState" class="text-center py-16">
+        <i class="fas fa-trash-can text-5xl text-slate-600 mb-4 block"></i>
+        <p class="text-slate-400 font-medium">Trash is empty</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ═══ NOTE EDIT MODAL ═══ -->
+<div id="noteModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
+  <div class="glass rounded-2xl w-full max-w-xl mx-4 modal-enter">
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-slate-100">Edit Note</h2>
+        <button id="closeModal" class="text-slate-400 hover:text-slate-200 transition-colors">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <input id="modalTitle" type="text" placeholder="Note title…"
+        class="w-full text-xl font-bold bg-transparent border-none outline-none mb-3 text-slate-100 placeholder-slate-500">
+      <textarea id="modalContent" placeholder="Note content…"
+        class="w-full h-48 bg-transparent border-none outline-none resize-none text-slate-200 placeholder-slate-500 text-sm"></textarea>
+      <input id="modalLabels" type="text" placeholder="Labels (comma-separated)"
+        class="w-full mt-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm
+               text-slate-200 placeholder-slate-500 outline-none focus:ring-1 focus:ring-sky-400">
+
+      <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/8">
+        <div class="flex gap-2">
+          <button class="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-sky-400 transition-colors" title="Add checklist item" id="modalChecklistBtn">
+            <i class="fas fa-list-check"></i>
+          </button>
+          <button class="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-sky-400 transition-colors" title="Set reminder" id="modalReminderBtn">
+            <i class="fas fa-bell"></i>
+          </button>
+          <button class="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-sky-400 transition-colors" title="Change color" id="modalColorBtn">
+            <i class="fas fa-palette"></i>
+          </button>
+        </div>
+        <button id="saveNote"
+          class="bg-sky-500 hover:bg-sky-400 text-white px-6 py-2 rounded-lg text-sm font-semibold">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS MODAL ═══ -->
+<div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
+  <div class="glass rounded-2xl w-full max-w-md mx-4 p-6 modal-enter">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="text-xl font-bold text-slate-100">Settings</h2>
+      <button id="closeSettings" class="text-slate-400 hover:text-slate-200 transition-colors">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+
+    <!-- Theme mode -->
+    <div class="mb-5">
+      <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Theme Mode</label>
+      <select id="themeMode"
+        class="w-full py-2 px-3 bg-white/5 border border-white/10 rounded-lg text-sm text-slate-200 outline-none
+               focus:ring-1 focus:ring-sky-400">
+        <option value="default">Default (Dark Space)</option>
+        <option value="neon">Neon Green</option>
+        <option value="pink">Pink Dream</option>
+        <option value="forest">Forest</option>
+        <option value="twilight">Twilight Purple</option>
+        <option value="ocean">Deep Ocean</option>
+        <option value="ember">Ember</option>
+      </select>
+    </div>
+
+    <!-- Sidebar toggles -->
+    <div class="space-y-3 text-sm mb-5">
+      <label class="flex items-center justify-between text-slate-300">
+        <span>Show Animated Background</span>
+        <input type="checkbox" id="settingBgAnim" checked class="accent-sky-400">
+      </label>
+    </div>
+
+    <!-- Export / Import (FIX: were referenced in JS but missing from HTML) -->
+    <div class="flex gap-3 pt-4 border-t border-white/8">
+      <button id="exportBtn"
+        class="flex-1 py-2 rounded-lg text-sm font-semibold bg-emerald-600/80 hover:bg-emerald-500 text-white transition-colors">
+        <i class="fas fa-file-export mr-2"></i>Export Notes
+      </button>
+      <button id="importBtn"
+        class="flex-1 py-2 rounded-lg text-sm font-semibold bg-violet-600/80 hover:bg-violet-500 text-white transition-colors">
+        <i class="fas fa-file-import mr-2"></i>Import Notes
+      </button>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <button id="saveSettings"
+        class="bg-sky-500 hover:bg-sky-400 text-white px-6 py-2 rounded-lg text-sm font-semibold">
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div id="toast" class="fixed bottom-5 right-5 z-50 glass rounded-xl px-4 py-3 shadow-xl hidden fade-in">
+  <div class="flex items-center gap-3">
+    <i id="toastIcon" class="fas fa-info-circle text-sky-400"></i>
+    <span id="toastMsg" class="text-sm text-slate-200">Message</span>
+    <button id="undoDelete" class="ml-2 text-sky-400 text-sm font-semibold hover:text-sky-300 hidden">Undo</button>
+    <button id="closeToast" class="ml-1 text-slate-400 hover:text-slate-200"><i class="fas fa-times text-xs"></i></button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  /* ═══════════════════════════════════════════════
+     AMAZING MULTI-LAYER CANVAS BACKGROUND
+  ═══════════════════════════════════════════════ */
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+  let mouse = { x: -9999, y: -9999 };
+  let animBg = true;
+
+  document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  document.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', () => { resize(); initParticles(); buildStars(); });
+  resize();
+
+  /* ── Star field ── */
+  let stars = [];
+  function buildStars() {
+    stars = Array.from({ length: 320 }, () => ({
+      x:  Math.random() * W,
+      y:  Math.random() * H,
+      r:  Math.random() * 1.3 + 0.25,
+      drift: Math.random() * 0.12 + 0.02,
+      phase: Math.random() * Math.PI * 2,
+      twSpd: Math.random() * 0.025 + 0.008,
+      col: ['255,255,255','210,235,255','255,245,210','180,255,245','220,200,255'][Math.floor(Math.random()*5)]
+    }));
+  }
+  buildStars();
+
+  /* ── Shooting stars ── */
+  let shooters = [];
+  function spawnShooter() {
+    if (!animBg) return;
+    const ang = (10 + Math.random() * 35) * Math.PI / 180;
+    shooters.push({
+      x: Math.random() * W * 0.75,
+      y: Math.random() * H * 0.35,
+      vx: Math.cos(ang) * (10 + Math.random() * 8),
+      vy: Math.sin(ang) * (10 + Math.random() * 8),
+      life: 1,
+      decay: Math.random() * 0.018 + 0.01,
+      tail: Math.random() * 90 + 60
+    });
+  }
+  function scheduleShooter() {
+    spawnShooter();
+    setTimeout(scheduleShooter, 3500 + Math.random() * 5000);
+  }
+  scheduleShooter();
+
+  /* ── Constellation particles ── */
+  let pts = [];
+  function initParticles() {
+    pts = Array.from({ length: 70 }, () => ({
+      x:  Math.random() * W,
+      y:  Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.45,
+      vy: (Math.random() - 0.5) * 0.45,
+      r:  Math.random() * 1.6 + 0.7,
+      col: ['56,189,248','16,185,129','139,92,246','251,191,36','251,113,133'][Math.floor(Math.random()*5)]
+    }));
+  }
+  initParticles();
+
+  /* ── Glowing orbs ── */
+  const ORBS = [
+    { col:'56,189,248',  r: 90,  spd: 0.28 },
+    { col:'139,92,246',  r: 110, spd: 0.22 },
+    { col:'16,185,129',  r: 75,  spd: 0.35 },
+    { col:'251,113,133', r: 65,  spd: 0.4  },
+  ];
+  const orbs = ORBS.map(o => ({
+    ...o,
+    x: Math.random() * W, y: Math.random() * H,
+    vx: (Math.random() - 0.5) * o.spd,
+    vy: (Math.random() - 0.5) * o.spd,
+    phase: Math.random() * Math.PI * 2
+  }));
+
+  /* ── Aurora config ── */
+  const auroraWaves = [
+    { col: '56,189,248',  baseY: 0.18, amp: 45, freq: 0.005,  spd: 0.28, opacity: 0.13 },
+    { col: '16,185,129',  baseY: 0.13, amp: 38, freq: 0.008,  spd: 0.45, opacity: 0.10 },
+    { col: '139,92,246',  baseY: 0.09, amp: 32, freq: 0.006,  spd: 0.38, opacity: 0.09 },
+    { col: '251,113,133', baseY: 0.06, amp: 24, freq: 0.009,  spd: 0.55, opacity: 0.07 },
+  ];
+
+  /* ── Nebula blobs ── */
+  const nebulas = [
+    { col:'56,189,248',  rx:0.15, ry:0.25, r:W*0.22 },
+    { col:'139,92,246',  rx:0.75, ry:0.15, r:W*0.18 },
+    { col:'16,185,129',  rx:0.85, ry:0.7,  r:W*0.16 },
+    { col:'251,113,133', rx:0.2,  ry:0.8,  r:W*0.14 },
+  ];
+
+  let T = 0;
+
+  function drawFrame() {
+    if (!animBg) {
+      // Static dark bg
+      ctx.fillStyle = '#07111e';
+      ctx.fillRect(0, 0, W, H);
+      requestAnimationFrame(drawFrame);
+      return;
+    }
+
+    ctx.clearRect(0, 0, W, H);
+
+    /* 1 ── Deep space base gradient */
+    const bgGrad = ctx.createRadialGradient(W*0.5, H*0.4, 0, W*0.5, H*0.5, Math.max(W,H)*0.8);
+    bgGrad.addColorStop(0,   '#0d1f35');
+    bgGrad.addColorStop(0.45,'#091222');
+    bgGrad.addColorStop(1,   '#040810');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    /* 2 ── Nebula blobs (very soft) */
+    nebulas.forEach(n => {
+      const g = ctx.createRadialGradient(n.rx*W, n.ry*H, 0, n.rx*W, n.ry*H, n.r);
+      g.addColorStop(0,   `rgba(${n.col},0.055)`);
+      g.addColorStop(0.5, `rgba(${n.col},0.025)`);
+      g.addColorStop(1,   `rgba(${n.col},0)`);
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    });
+
+    /* 3 ── Aurora waves */
+    auroraWaves.forEach(w => {
+      ctx.beginPath();
+      ctx.moveTo(0, H * w.baseY);
+      for (let x = 0; x <= W; x += 5) {
+        const y = H * w.baseY
+          + Math.sin(x * w.freq + T * w.spd) * w.amp
+          + Math.sin(x * w.freq * 2.5 + T * w.spd * 1.8) * w.amp * 0.35;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, 0); ctx.lineTo(0, 0); ctx.closePath();
+      const ag = ctx.createLinearGradient(0, 0, 0, H * w.baseY + w.amp * 2);
+      ag.addColorStop(0,   `rgba(${w.col},${w.opacity})`);
+      ag.addColorStop(0.55,`rgba(${w.col},${w.opacity * 0.45})`);
+      ag.addColorStop(1,   `rgba(${w.col},0)`);
+      ctx.fillStyle = ag;
+      ctx.fill();
+    });
+
+    /* 4 ── Glowing orbs */
+    orbs.forEach(o => {
+      o.phase += 0.006;
+      o.x += o.vx + Math.sin(o.phase) * 0.25;
+      o.y += o.vy + Math.cos(o.phase * 0.8) * 0.2;
+      if (o.x < -o.r*2) o.x = W + o.r;
+      if (o.x > W+o.r*2) o.x = -o.r;
+      if (o.y < -o.r*2) o.y = H + o.r;
+      if (o.y > H+o.r*2) o.y = -o.r;
+      const pulse = 0.05 + 0.025 * Math.sin(o.phase * 2.4);
+      const og = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+      og.addColorStop(0,   `rgba(${o.col},${pulse * 1.8})`);
+      og.addColorStop(0.4, `rgba(${o.col},${pulse})`);
+      og.addColorStop(1,   `rgba(${o.col},0)`);
+      ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2);
+      ctx.fillStyle = og; ctx.fill();
+    });
+
+    /* 5 ── Stars with twinkle + mouse parallax */
+    stars.forEach(s => {
+      s.x += s.drift;
+      if (s.x > W + 4) s.x = -4;
+      s.phase += s.twSpd;
+      const alpha = 0.35 + 0.65 * (Math.sin(s.phase) * 0.5 + 0.5);
+      const px = s.x + (mouse.x / W - 0.5) * s.r * 7;
+      const py = s.y + (mouse.y / H - 0.5) * s.r * 7;
+      ctx.beginPath(); ctx.arc(px, py, s.r, 0, Math.PI*2);
+      ctx.shadowBlur = s.r * 4;
+      ctx.shadowColor = `rgba(${s.col},${alpha * 0.6})`;
+      ctx.fillStyle = `rgba(${s.col},${alpha})`;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+
+    /* 6 ── Shooting stars */
+    shooters = shooters.filter(s => s.life > 0);
+    shooters.forEach(s => {
+      s.x += s.vx; s.y += s.vy; s.life -= s.decay;
+      const tx = s.x - s.vx * (s.tail / 12);
+      const ty = s.y - s.vy * (s.tail / 12);
+      const sg = ctx.createLinearGradient(tx, ty, s.x, s.y);
+      sg.addColorStop(0,   `rgba(255,255,255,0)`);
+      sg.addColorStop(0.7, `rgba(200,230,255,${s.life * 0.55})`);
+      sg.addColorStop(1,   `rgba(255,255,255,${s.life})`);
+      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(s.x, s.y);
+      ctx.strokeStyle = sg;
+      ctx.lineWidth = Math.max(0.1, s.life * 2.2);
+      ctx.lineCap = 'round'; ctx.stroke();
+    });
+
+    /* 7 ── Constellation particles */
+    pts.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+      // Mouse repulsion
+      const dx = p.x - mouse.x, dy = p.y - mouse.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 130 && d > 0) { p.vx += (dx/d)*0.18; p.vy += (dy/d)*0.18; }
+      // Speed cap
+      const spd = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+      if (spd > 1.4) { p.vx = p.vx/spd*1.4; p.vy = p.vy/spd*1.4; }
+    });
+    // Draw connections
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i+1; j < pts.length; j++) {
+        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 140) {
+          const alpha = (1 - d/140) * 0.28;
+          ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
+          ctx.strokeStyle = `rgba(${pts[i].col},${alpha})`;
+          ctx.lineWidth = 0.7; ctx.stroke();
+        }
+      }
+    }
+    // Draw dots
+    pts.forEach(p => {
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${p.col},0.85)`;
+      ctx.shadowBlur = 7; ctx.shadowColor = `rgba(${p.col},0.55)`;
+      ctx.fill(); ctx.shadowBlur = 0;
+    });
+
+    T += 0.012;
+    requestAnimationFrame(drawFrame);
+  }
+  drawFrame();
+
+
+  /* ═══════════════════════════════════════════════
+     THEME
+  ═══════════════════════════════════════════════ */
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = themeToggle.querySelector('i');
+
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  if (savedTheme === 'light') {
+    document.body.classList.add('light');
+    themeIcon.className = 'fas fa-sun';
+  }
+
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+    const isLight = document.body.classList.contains('light');
+    themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  });
+
+  /* Theme modes */
+  const THEME_ORBS = {
+    neon:     [{ col:'20,200,160', r:100 },{ col:'34,197,94', r:80 }],
+    pink:     [{ col:'244,114,182', r:100 },{ col:'251,207,232', r:80 }],
+    forest:   [{ col:'22,163,74', r:100 },{ col:'20,184,166', r:80 }],
+    twilight: [{ col:'139,92,246', r:110 },{ col:'99,102,241', r:80 }],
+    ocean:    [{ col:'14,165,233', r:120 },{ col:'6,182,212', r:80 }],
+    ember:    [{ col:'249,115,22', r:100 },{ col:'239,68,68', r:80 }],
+    default:  [{ col:'56,189,248', r:90 },{ col:'139,92,246', r:110 },{ col:'16,185,129', r:75 },{ col:'251,113,133', r:65 }]
+  };
+
+  function applyThemeMode(mode) {
+    // Update orbs colors
+    const palette = THEME_ORBS[mode] || THEME_ORBS.default;
+    palette.forEach((cfg, i) => {
+      if (orbs[i]) { orbs[i].col = cfg.col; orbs[i].r = cfg.r; }
+    });
+    // Update aurora
+    if (mode === 'neon') {
+      auroraWaves[0].col = '20,200,160'; auroraWaves[1].col = '34,197,94';
+    } else if (mode === 'pink') {
+      auroraWaves[0].col = '244,114,182'; auroraWaves[1].col = '251,207,232';
+    } else if (mode === 'twilight') {
+      auroraWaves[0].col = '139,92,246'; auroraWaves[1].col = '99,102,241';
+    } else {
+      auroraWaves[0].col = '56,189,248'; auroraWaves[1].col = '16,185,129';
+      auroraWaves[2].col = '139,92,246'; auroraWaves[3].col = '251,113,133';
+    }
+    localStorage.setItem('themeMode', mode);
+  }
+  applyThemeMode(localStorage.getItem('themeMode') || 'default');
+
+
+  /* ═══════════════════════════════════════════════
+     TAB NAVIGATION
+  ═══════════════════════════════════════════════ */
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab + 'Tab').classList.remove('hidden');
+      if (btn.dataset.tab === 'stats') updateStatistics();
+      if (btn.dataset.tab === 'trash') renderTrash();
+    });
+  });
+
+
+  /* ═══════════════════════════════════════════════
+     MOBILE MENU
+  ═══════════════════════════════════════════════ */
+  const sidebar = document.getElementById('sidebar');
+  document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+    sidebar.classList.toggle('hidden');
+    sidebar.classList.toggle('open');
+    if (!sidebar.classList.contains('hidden')) {
+      let bd = document.getElementById('sideBackdrop');
+      if (!bd) {
+        bd = document.createElement('div');
+        bd.id = 'sideBackdrop';
+        bd.className = 'fixed inset-0 z-30 bg-black/50 md:hidden';
+        bd.onclick = () => { sidebar.classList.add('hidden'); sidebar.classList.remove('open'); bd.remove(); };
+        document.body.appendChild(bd);
+      }
+    }
+  });
+  document.getElementById('mobileSearchBtn').addEventListener('click', () =>
+    document.getElementById('searchInput').focus()
+  );
+
+
+  /* ═══════════════════════════════════════════════
+     VIEW TOGGLE
+  ═══════════════════════════════════════════════ */
+  const viewToggle = document.getElementById('viewToggle');
+  const viewIcon = viewToggle.querySelector('i');
+  viewToggle.addEventListener('click', () => {
+    document.getElementById('notesTab').classList.toggle('list-view');
+    const isList = document.getElementById('notesTab').classList.contains('list-view');
+    viewIcon.className = isList ? 'fas fa-list' : 'fas fa-th-large';
+  });
+
+
+  /* ═══════════════════════════════════════════════
+     SEARCH
+  ═══════════════════════════════════════════════ */
+  let searchQuery = '';
+  document.getElementById('searchInput').addEventListener('input', function () {
+    searchQuery = this.value.toLowerCase();
+    renderNotes();
+  });
+
+
+  /* ═══════════════════════════════════════════════
+     SETTINGS
+  ═══════════════════════════════════════════════ */
+  const settingsModal  = document.getElementById('settingsModal');
+  const themeModeSelect = document.getElementById('themeMode');
+  const settingBgAnim  = document.getElementById('settingBgAnim');
+
+  document.getElementById('settingsBtn').addEventListener('click', () => {
+    themeModeSelect.value = localStorage.getItem('themeMode') || 'default';
+    settingBgAnim.checked = localStorage.getItem('settingBgAnim') !== 'false';
+    settingsModal.classList.remove('hidden');
+  });
+  document.getElementById('closeSettings').addEventListener('click', () => settingsModal.classList.add('hidden'));
+
+  document.getElementById('saveSettings').addEventListener('click', () => {
+    applyThemeMode(themeModeSelect.value);
+    animBg = settingBgAnim.checked;
+    localStorage.setItem('settingBgAnim', settingBgAnim.checked);
+    settingsModal.classList.add('hidden');
+    showToast('Settings saved', 'fas fa-check-circle text-emerald-400');
+  });
+
+  // Restore setting on load
+  if (localStorage.getItem('settingBgAnim') === 'false') animBg = false;
+
+
+  /* ═══════════════════════════════════════════════
+     LABELS
+  ═══════════════════════════════════════════════ */
+  let labels = JSON.parse(localStorage.getItem('labels')) || [];
+  let activeLabel = null;
+  const labelsList = document.getElementById('labelsList');
+
+  function renderLabels() {
+    labelsList.innerHTML = '';
+    labels.forEach(label => {
+      const el = document.createElement('div');
+      el.className = 'flex items-center justify-between group';
+      el.innerHTML = `
+        <a href="#" class="sidebar-item flex-1 text-sm" data-label-name="${label}">
+          <i class="fas fa-tag w-4 text-xs"></i><span>${label}</span>
+        </a>
+        <button class="text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition px-1"
+                data-label-delete="${label}">
+          <i class="fas fa-times text-xs"></i>
+        </button>`;
+      labelsList.appendChild(el);
+    });
+    labelsList.querySelectorAll('[data-label-name]').forEach(el => {
+      el.addEventListener('click', e => {
+        e.preventDefault();
+        activeLabel = el.dataset.labelName;
+        currentFilter = 'all';
+        document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+        document.querySelector('[data-filter="all"]').classList.add('active');
+        renderNotes();
+      });
+    });
+    labelsList.querySelectorAll('[data-label-delete]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const lbl = btn.dataset.labelDelete;
+        if (!confirm(`Delete label "${lbl}"?`)) return;
+        labels = labels.filter(l => l !== lbl);
+        localStorage.setItem('labels', JSON.stringify(labels));
+        notes.forEach(n => { if (n.labels) n.labels = n.labels.filter(l => l !== lbl); });
+        saveNotes();
+        if (activeLabel === lbl) activeLabel = null;
+        renderLabels(); renderNotes();
+      });
+    });
+  }
+
+  document.getElementById('addLabelBtn').addEventListener('click', () => {
+    const name = prompt('New label name:');
+    if (!name || !name.trim()) return;
+    const t = name.trim();
+    if (labels.includes(t)) { alert('Label already exists.'); return; }
+    labels.push(t);
+    localStorage.setItem('labels', JSON.stringify(labels));
+    renderLabels();
+  });
+
+  document.getElementById('clearLabelsBtn').addEventListener('click', () => {
+    if (!confirm('Clear all labels?')) return;
+    labels = [];
+    notes.forEach(n => n.labels = []);
+    localStorage.setItem('labels', JSON.stringify(labels));
+    saveNotes(); renderLabels(); renderNotes();
+  });
+
+  renderLabels();
+
+
+  /* ═══════════════════════════════════════════════
+     SIDEBAR FILTER
+  ═══════════════════════════════════════════════ */
+  let currentFilter = 'all';
+  document.querySelectorAll('.sidebar-item[data-filter]').forEach(item => {
+    item.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      currentFilter = item.dataset.filter;
+      activeLabel = null;
+      // Switch to right tab
+      if (currentFilter === 'trash') {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        document.querySelector('[data-tab="trash"]').classList.add('active');
+        document.getElementById('trashTab').classList.remove('hidden');
+        renderTrash();
+      } else {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+        document.querySelector('[data-tab="notes"]').classList.add('active');
+        document.getElementById('notesTab').classList.remove('hidden');
+        renderNotes();
+      }
+    });
+  });
+
+
+  /* ═══════════════════════════════════════════════
+     NOTES DATA
+  ═══════════════════════════════════════════════ */
+  let notes = JSON.parse(localStorage.getItem('notes')) || [];
+  let currentNoteId = null;
+  const notesContainer = document.getElementById('notesContainer');
+  const emptyState     = document.getElementById('emptyState');
+
+  function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+  function formatDate(date) {
+    const d = new Date(date), now = new Date();
+    const diff = now - d;
+    const mins = Math.floor(diff/60000), hrs = Math.floor(diff/3600000), days = Math.floor(diff/86400000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    if (hrs < 24) return `${hrs}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return d.toLocaleDateString();
+  }
+  function saveNotes() {
+    localStorage.setItem('notes', JSON.stringify(notes));
+    updateQuickStats();
+  }
+
+  /* FIX: always clear container first, THEN check empty */
+  function renderNotes() {
+    notesContainer.innerHTML = '';   // ← FIXED: was not clearing before early return
+    let filtered = notes.filter(n => {
+      switch (currentFilter) {
+        case 'all':       return !n.trashed && !n.archived;
+        case 'reminders': return !n.trashed && n.reminder;
+        case 'labels':    return !n.trashed && !n.archived && (n.labels||[]).length > 0;
+        case 'archive':   return !n.trashed && n.archived;
+        default:          return !n.trashed && !n.archived;
+      }
+    });
+    if (activeLabel)  filtered = filtered.filter(n => (n.labels||[]).includes(activeLabel));
+    if (searchQuery)  filtered = filtered.filter(n =>
+      (n.title||'').toLowerCase().includes(searchQuery) ||
+      (n.content||'').toLowerCase().includes(searchQuery) ||
+      (n.labels||[]).join(' ').toLowerCase().includes(searchQuery)
+    );
+    const sorted = filtered.sort((a,b) => (b.pinned - a.pinned) || (new Date(b.updatedAt) - new Date(a.updatedAt)));
+
+    if (sorted.length === 0) {
+      emptyState.classList.remove('hidden');
+      return;
+    }
+    emptyState.classList.add('hidden');
+    sorted.forEach(n => notesContainer.appendChild(renderNoteCard(n)));
+  }
+
+  function renderNoteCard(note) {
+    const card = document.createElement('div');
+    card.className = 'note-card glass rounded-xl p-4 mb-4 fade-in cursor-pointer';
+    if (note.color && note.color !== '#ffffff') card.style.backgroundColor = note.color;
+    card.dataset.id = note.id;
+    card.innerHTML = `
+      <div class="flex justify-between items-start gap-2">
+        <h3 class="font-bold text-base leading-snug">${note.title || 'Untitled'}</h3>
+        <button class="text-slate-400 hover:text-sky-400 shrink-0 transition-colors" data-action="pin" title="${note.pinned ? 'Unpin' : 'Pin'}">
+          <i class="fas fa-thumbtack text-sm ${note.pinned ? 'text-sky-400' : ''}"></i>
+        </button>
+      </div>
+      ${(note.labels||[]).length ? `<div class="mt-2 flex flex-wrap gap-1">
+        ${note.labels.map(l=>`<span class="text-xs bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded-full">${l}</span>`).join('')}
+      </div>` : ''}
+      ${note.content ? `<p class="mt-2 text-sm text-slate-300 line-clamp-4">${note.content}</p>` : ''}
+      ${(note.checklist||[]).length ? `<div class="mt-3 space-y-1">
+        ${note.checklist.map(i=>`<div class="flex items-center gap-2 text-xs">
+          <i class="fas fa-${i.checked ? 'check-square text-emerald-400' : 'square text-slate-500'}"></i>
+          <span class="${i.checked ? 'line-through text-slate-500' : 'text-slate-300'}">${i.text}</span>
+        </div>`).join('')}
+      </div>` : ''}
+      ${note.reminder ? `<div class="mt-2 text-xs text-amber-400"><i class="fas fa-bell mr-1"></i>${new Date(note.reminder).toLocaleString()}</div>` : ''}
+      <div class="mt-3 flex justify-between items-center">
+        <span class="text-xs text-slate-500">${formatDate(note.updatedAt)}</span>
+        <div class="flex gap-2">
+          <button class="text-slate-400 hover:text-amber-400 transition-colors" data-action="color" data-id="${note.id}" title="Color"><i class="fas fa-palette text-xs"></i></button>
+          <button class="text-slate-400 hover:text-sky-400 transition-colors" data-action="archive" title="${note.archived ? 'Unarchive' : 'Archive'}"><i class="fas fa-${note.archived ? 'inbox' : 'archive'} text-xs"></i></button>
+          <button class="text-slate-400 hover:text-red-400 transition-colors" data-action="trash" title="Delete"><i class="fas fa-trash text-xs"></i></button>
+        </div>
+      </div>`;
+    card.addEventListener('click', e => { if (!e.target.closest('button')) openEditModal(note.id); });
+    card.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); handleNoteAction(note.id, btn.dataset.action); });
+    });
+    return card;
+  }
+
+  function handleNoteAction(id, action) {
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
+    if (action === 'pin')    { note.pinned = !note.pinned; }
+    if (action === 'archive'){ note.archived = !note.archived; }
+    if (action === 'color')  { showColorPicker(note); return; }
+    if (action === 'trash')  { moveToTrash(id); return; }
+    note.updatedAt = new Date().toISOString();
+    saveNotes(); renderNotes();
+  }
+
+  /* ── Color picker ── */
+  const COLOR_PALETTE = [
+    '#07111e','#fecaca','#fed7aa','#fef08a','#bbf7d0',
+    '#bfdbfe','#e9d5ff','#fbcfe8','#d1fae5','#1e293b'
+  ];
+  function showColorPicker(note) {
+    document.querySelectorAll('.color-popup').forEach(p => p.remove());
+    const popup = document.createElement('div');
+    popup.className = 'color-popup fixed z-50 glass rounded-xl p-3 shadow-2xl';
+    popup.innerHTML = `<div class="flex flex-wrap gap-2 w-52">${
+      COLOR_PALETTE.map(c => `<div class="color-dot ${c===note.color?'active':''}" style="background:${c};border:1.5px solid rgba(255,255,255,0.15)" data-color="${c}"></div>`).join('')
+    }</div>`;
+    const btn = document.querySelector(`[data-action="color"][data-id="${note.id}"]`);
+    if (btn) {
+      const r = btn.getBoundingClientRect();
+      popup.style.left = Math.min(r.left, W - 240) + 'px';
+      popup.style.top  = r.bottom + 8 + 'px';
+    } else {
+      popup.style.left = '50%'; popup.style.top = '50%';
+      popup.style.transform = 'translate(-50%,-50%)';
+    }
+    document.body.appendChild(popup);
+    popup.querySelectorAll('.color-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        note.color = dot.dataset.color;
+        note.updatedAt = new Date().toISOString();
+        saveNotes(); renderNotes(); popup.remove();
+      });
+    });
+    setTimeout(() => {
+      const close = e => { if (!popup.contains(e.target)) { popup.remove(); document.removeEventListener('click', close); } };
+      document.addEventListener('click', close);
+    }, 0);
+  }
+
+  /* ── Create note ── */
+  function createNote(title, content = '', type = 'text') {
+    const note = {
+      id: generateId(), title, content, type,
+      color: '', pinned: false, archived: false, trashed: false,
+      labels: [], checklist: type === 'checklist' ? [{ text: 'Task 1', checked: false }] : [],
+      reminder: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    notes.push(note);
+    saveNotes(); // saveNotes already calls updateQuickStats
+    renderNotes();
+    return note;
+  }
+
+  /* ── Quick add ── */
+  document.getElementById('quickAddBtn').addEventListener('click', () => {
+    const v = document.getElementById('quickTitle').value.trim();
+    if (v) { createNote(v); document.getElementById('quickTitle').value = ''; }
+  });
+  document.getElementById('quickTitle').addEventListener('keypress', e => {
+    if (e.key === 'Enter') document.getElementById('quickAddBtn').click();
+  });
+
+  /* ── Edit modal ── */
+  function openEditModal(id) {
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
+    currentNoteId = id;
+    document.getElementById('modalTitle').value   = note.title || '';
+    document.getElementById('modalContent').value = note.content || '';
+    document.getElementById('modalLabels').value  = (note.labels || []).join(', ');
+    const modal = document.getElementById('noteModal');
+    modal.classList.remove('modal-enter');
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.add('modal-enter'), 10);
+  }
+  function closeEditModal() {
+    document.getElementById('noteModal').classList.add('hidden');
+    currentNoteId = null;
+  }
+  document.getElementById('closeModal').addEventListener('click', closeEditModal);
+  document.getElementById('noteModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('noteModal')) closeEditModal();
+  });
+
+  /* Auto-save */
+  function debounce(fn, ms) {
+    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  }
+  const autoSave = debounce(() => {
+    if (!currentNoteId) return;
+    const note = notes.find(n => n.id === currentNoteId);
+    if (note) {
+      note.title   = document.getElementById('modalTitle').value;
+      note.content = document.getElementById('modalContent').value;
+      note.updatedAt = new Date().toISOString();
+      saveNotes();
+    }
+  }, 600);
+  document.getElementById('modalTitle').addEventListener('input',   autoSave);
+  document.getElementById('modalContent').addEventListener('input', autoSave);
+
+  document.getElementById('saveNote').addEventListener('click', () => {
+    if (!currentNoteId) { closeEditModal(); return; }
+    const note = notes.find(n => n.id === currentNoteId);
+    if (note) {
+      note.title   = document.getElementById('modalTitle').value;
+      note.content = document.getElementById('modalContent').value;
+      note.labels  = document.getElementById('modalLabels').value.split(',').map(l => l.trim()).filter(Boolean);
+      note.updatedAt = new Date().toISOString();
+      saveNotes(); renderNotes(); renderLabels();
+    }
+    closeEditModal();
+  });
+
+  /* Modal toolbar buttons */
+  document.getElementById('modalChecklistBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    const note = notes.find(n => n.id === currentNoteId);
+    if (!note) return;
+    const item = prompt('Add checklist item:');
+    if (!item?.trim()) return;
+    note.checklist = note.checklist || [];
+    note.checklist.push({ text: item.trim(), checked: false });
+    note.updatedAt = new Date().toISOString();
+    saveNotes(); renderNotes(); openEditModal(note.id);
+  });
+  document.getElementById('modalReminderBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    const note = notes.find(n => n.id === currentNoteId);
+    if (!note) return;
+    const d = prompt('Set reminder (YYYY-MM-DD HH:MM):');
+    if (!d) return;
+    const dt = new Date(d);
+    if (isNaN(dt)) { alert('Invalid date.'); return; }
+    note.reminder = dt.toISOString();
+    note.updatedAt = new Date().toISOString();
+    saveNotes(); renderNotes(); openEditModal(note.id);
+  });
+  document.getElementById('modalColorBtn').addEventListener('click', e => {
+    e.stopPropagation();
+    const note = notes.find(n => n.id === currentNoteId);
+    if (note) showColorPicker(note);
+  });
+
+
+  /* ═══════════════════════════════════════════════
+     TOAST
+  ═══════════════════════════════════════════════ */
+  let toastTimer;
+  function showToast(msg, iconClass = 'fas fa-info-circle text-sky-400', duration = 3500) {
+    clearTimeout(toastTimer);
+    const toast = document.getElementById('toast');
+    document.getElementById('toastIcon').className = iconClass;
+    document.getElementById('toastMsg').textContent = msg;
+    document.getElementById('undoDelete').classList.add('hidden');
+    toast.classList.remove('hidden');
+    toastTimer = setTimeout(() => toast.classList.add('hidden'), duration);
+  }
+  function showUndoToast(id) {
+    clearTimeout(toastTimer);
+    const toast = document.getElementById('toast');
+    document.getElementById('toastIcon').className = 'fas fa-trash-restore text-sky-400';
+    document.getElementById('toastMsg').textContent = 'Note moved to trash.';
+    const undo = document.getElementById('undoDelete');
+    undo.classList.remove('hidden');
+    undo.onclick = () => {
+      const note = notes.find(n => n.id === id);
+      if (note) { note.trashed = false; note.updatedAt = new Date().toISOString(); }
+      trash = trash.filter(t => t.id !== id);
+      saveNotes(); saveTrash(); renderNotes(); renderTrash();
+      toast.classList.add('hidden');
+    };
+    toast.classList.remove('hidden');
+    toastTimer = setTimeout(() => toast.classList.add('hidden'), 5500);
+  }
+  document.getElementById('closeToast').addEventListener('click', () =>
+    document.getElementById('toast').classList.add('hidden')
+  );
+
+
+  /* ═══════════════════════════════════════════════
+     TRASH
+  ═══════════════════════════════════════════════ */
+  let trash = JSON.parse(localStorage.getItem('trash')) || [];
+  function saveTrash() { localStorage.setItem('trash', JSON.stringify(trash)); }
+
+  function moveToTrash(id) {
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
+    note.trashed = true;
+    note.updatedAt = new Date().toISOString();
+    if (!trash.find(t => t.id === id)) trash.push({ ...note, deletedAt: new Date().toISOString() });
+    saveNotes(); saveTrash(); renderNotes(); renderTrash();
+    showUndoToast(id);
+  }
+
+  function renderTrash() {
+    const container  = document.getElementById('trashContainer');
+    const emptyState = document.getElementById('emptyTrashState');
+    container.innerHTML = '';
+    if (trash.length === 0) { emptyState.classList.remove('hidden'); return; }
+    emptyState.classList.add('hidden');
+    trash.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'trash-item glass rounded-xl p-4 fade-in';
+      el.innerHTML = `
+        <div class="flex justify-between items-start mb-1">
+          <h3 class="font-bold">${item.title || 'Untitled'}</h3>
+          <span class="text-xs text-slate-500">Deleted ${formatDate(item.deletedAt)}</span>
+        </div>
+        <p class="text-sm text-slate-400 mt-1">${(item.content||'').substring(0,120)}${(item.content||'').length>120?'…':''}</p>
+        <div class="mt-3 flex gap-3 justify-end">
+          <button class="restore-item text-sky-400 hover:text-sky-300 text-sm font-medium" data-id="${item.id}">
+            <i class="fas fa-undo mr-1"></i>Restore
+          </button>
+          <button class="delete-forever text-red-400 hover:text-red-300 text-sm font-medium" data-id="${item.id}">
+            <i class="fas fa-trash mr-1"></i>Delete Forever
+          </button>
+        </div>`;
+      container.appendChild(el);
+    });
+    container.querySelectorAll('.restore-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const note = notes.find(n => n.id === id);
+        if (note) { note.trashed = false; note.updatedAt = new Date().toISOString(); }
+        else {
+          const item = trash.find(t => t.id === id);
+          if (item) notes.push({ ...item, trashed: false });
+        }
+        trash = trash.filter(t => t.id !== id);
+        saveNotes(); saveTrash(); renderTrash(); renderNotes();
+        showToast('Note restored!', 'fas fa-undo text-sky-400');
+      });
+    });
+    container.querySelectorAll('.delete-forever').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (!confirm('Permanently delete this note?')) return;
+        const id = btn.dataset.id;
+        trash = trash.filter(t => t.id !== id);
+        notes = notes.filter(n => n.id !== id);
+        saveNotes(); saveTrash(); renderTrash(); renderNotes();
+        showToast('Note permanently deleted', 'fas fa-trash text-red-400');
+      });
+    });
+  }
+
+  /* FIX: emptyTrashBtn also removes trashed notes from main array */
+  document.getElementById('emptyTrashBtn').addEventListener('click', () => {
+    if (!confirm('Permanently delete all items in trash?')) return;
+    const trashIds = new Set(trash.map(t => t.id));
+    notes = notes.filter(n => !trashIds.has(n.id));   // ← FIXED: remove from notes too
+    trash = [];
+    saveNotes(); saveTrash(); renderTrash(); renderNotes();
+    showToast('Trash emptied', 'fas fa-trash text-red-400');
+  });
+
+  /* FIX: restoreAll does NOT push duplicates, just flips trashed flag */
+  document.getElementById('restoreAllBtn').addEventListener('click', () => {
+    if (trash.length === 0) return;
+    trash.forEach(item => {
+      const existing = notes.find(n => n.id === item.id);
+      if (existing) {
+        existing.trashed = false;                          // ← FIXED: just update flag
+        existing.updatedAt = new Date().toISOString();
+      } else {
+        notes.push({ ...item, trashed: false });           // only add if truly missing
+      }
+    });
+    trash = [];
+    saveNotes(); saveTrash(); renderTrash(); renderNotes();
+    showToast('All items restored!', 'fas fa-undo text-sky-400');
+  });
+
+  renderTrash();
+
+
+  /* ═══════════════════════════════════════════════
+     TASKS
+  ═══════════════════════════════════════════════ */
+  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  const tasksContainer = document.getElementById('tasksContainer');
+  const emptyTasksState = document.getElementById('emptyTasksState');
+
+  function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    updateQuickStats();
+  }
+
+  function renderTasks() {
+    tasksContainer.innerHTML = '';
+    const sorted = [...tasks].sort((a,b) => new Date(b.date) - new Date(a.date));
+    if (sorted.length === 0) { emptyTasksState.classList.remove('hidden'); return; }
+    emptyTasksState.classList.add('hidden');
+    sorted.forEach(task => {
+      const el = document.createElement('div');
+      el.className = 'task-card glass rounded-xl p-4 flex items-center gap-4 fade-in';
+      el.innerHTML = `
+        <input type="checkbox" class="w-5 h-5 accent-sky-400 cursor-pointer" ${task.completed ? 'checked' : ''} data-id="${task.id}">
+        <span class="flex-1 text-sm ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${task.text}</span>
+        <span class="text-xs text-slate-500 shrink-0">${formatDate(task.date)}</span>
+        <button class="del-task text-slate-400 hover:text-red-400 transition-colors" data-id="${task.id}">
+          <i class="fas fa-trash text-xs"></i>
+        </button>`;
+      tasksContainer.appendChild(el);
+    });
+    tasksContainer.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const t = tasks.find(t => t.id === cb.dataset.id);
+        if (t) { t.completed = cb.checked; saveTasks(); renderTasks(); }
+      });
+    });
+    tasksContainer.querySelectorAll('.del-task').forEach(btn => {
+      btn.addEventListener('click', () => {
+        tasks = tasks.filter(t => t.id !== btn.dataset.id);
+        saveTasks(); renderTasks();
+      });
+    });
+  }
+
+  document.getElementById('addTaskBtn').addEventListener('click', () => {
+    const v = document.getElementById('taskInput').value.trim();
+    if (v) {
+      tasks.push({ id: generateId(), text: v, completed: false, date: new Date().toISOString() });
+      document.getElementById('taskInput').value = '';
+      saveTasks(); renderTasks();
+    }
+  });
+  document.getElementById('taskInput').addEventListener('keypress', e => {
+    if (e.key === 'Enter') document.getElementById('addTaskBtn').click();
+  });
+  renderTasks();
+
+
+  /* ═══════════════════════════════════════════════
+     STATISTICS
+  ═══════════════════════════════════════════════ */
+  function updateStatistics() {
+    const total = notes.length;
+    const done  = tasks.filter(t => t.completed).length;
+    const rate  = tasks.length ? Math.round(done/tasks.length*100) : 0;
+    document.getElementById('statTotalNotes').textContent     = total;
+    document.getElementById('statTasksCompleted').textContent = done;
+    document.getElementById('statCompletionRate').textContent = rate + '%';
+    const monthly = new Array(12).fill(0);
+    notes.forEach(n => monthly[new Date(n.createdAt).getMonth()]++);
+    drawMonthlyChart(monthly);
+    drawYearlyHeatmap();
+  }
+
+  function drawMonthlyChart(data) {
+    const cnv = document.getElementById('monthlyChart');
+    if (!cnv) return;
+    const c = cnv.getContext('2d');
+    const W = cnv.offsetWidth || 600;
+    cnv.width = W; cnv.height = 120;
+    const h = cnv.height;
+    const maxV = Math.max(...data, 1);
+    const bw = W / 12;
+    c.clearRect(0, 0, W, h);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    data.forEach((v, i) => {
+      const bh = Math.max(2, (v/maxV) * (h-30));
+      const x = i * bw + bw*0.2;
+      const y = h - bh - 20;
+      const grad = c.createLinearGradient(0, y, 0, h-20);
+      grad.addColorStop(0, 'rgba(56,189,248,0.9)');
+      grad.addColorStop(1, 'rgba(16,185,129,0.6)');
+      c.fillStyle = grad;
+      c.beginPath();
+      c.roundRect ? c.roundRect(x, y, bw*0.6, bh, [4,4,0,0]) : c.rect(x, y, bw*0.6, bh);
+      c.fill();
+      c.fillStyle = '#64748b'; c.font = '11px Sora'; c.textAlign = 'center';
+      c.fillText(months[i], x + bw*0.3, h-4);
+      if (v > 0) {
+        c.fillStyle = '#38bdf8'; c.font = 'bold 11px Sora';
+        c.fillText(v, x + bw*0.3, y - 4);
+      }
+    });
+  }
+
+  function drawYearlyHeatmap() {
+    const hm = document.getElementById('yearlyHeatmap');
+    if (!hm) return;
+    hm.innerHTML = '';
+    const monthly = new Array(12).fill(0);
+    tasks.forEach(t => { if (t.completed) monthly[new Date(t.date).getMonth()]++; });
+    const maxV = Math.max(...monthly, 1);
+    const months = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+    months.forEach((m, i) => {
+      const intensity = monthly[i] / maxV;
+      const cell = document.createElement('div');
+      cell.className = 'stat-card glass rounded-lg flex items-center justify-center font-bold text-sm aspect-square cursor-help';
+      cell.style.background = `rgba(56,189,248,${0.08 + intensity * 0.65})`;
+      cell.textContent = m;
+      cell.title = `${monthly[i]} tasks in month ${i+1}`;
+      hm.appendChild(cell);
+    });
+  }
+
+
+  /* ═══════════════════════════════════════════════
+     QUICK STATS (FIX: elements now exist in HTML)
+  ═══════════════════════════════════════════════ */
+  function updateQuickStats() {
+    const today = new Date().toDateString();
+    const todayTasks = tasks.filter(t => new Date(t.date).toDateString() === today);
+    document.getElementById('totalNotesCount').textContent  = notes.length;
+    document.getElementById('tasksCountToday').textContent  = todayTasks.length;
+    document.getElementById('completedTodayCount').textContent = todayTasks.filter(t => t.completed).length;
+  }
+  updateQuickStats();
+
+
+  /* ═══════════════════════════════════════════════
+     EXPORT / IMPORT (FIX: buttons now exist in HTML)
+  ═══════════════════════════════════════════════ */
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `ashvinz-notes-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Notes exported!', 'fas fa-file-export text-emerald-400');
+  });
+
+  document.getElementById('importBtn').addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.json,application/json';
+    input.onchange = e => {
+      const file = e.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const imported = JSON.parse(ev.target.result);
+          if (!Array.isArray(imported)) throw new Error('Expected array of notes');
+          const valid = imported.filter(n => n && (n.title || n.content));
+          const existIds = new Set(notes.map(n => n.id));
+          const newNotes = valid.filter(n => !existIds.has(n.id));
+          notes.unshift(...newNotes);
+          saveNotes(); renderNotes();
+          showToast(`Imported ${newNotes.length} notes!`, 'fas fa-file-import text-violet-400');
+        } catch(err) {
+          alert('Import failed: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  });
+
+
+  /* ── Initial renders ── */
+  renderNotes();
+  updateQuickStats();
+
+}); // end DOMContentLoaded
+</script>
 </body>
 </html>
