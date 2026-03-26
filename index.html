@@ -1,1541 +1,1402 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ashvinz Notes</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta name="theme-color" content="#f6f8fc">
+  <title>Aswin Notes</title>
   <style>
-    * { font-family: 'Sora', sans-serif; box-sizing: border-box; }
-
-    /* ─── Canvas BG ─── */
-    #bgCanvas {
-      position: fixed; inset: 0; z-index: -1;
-      width: 100%; height: 100%;
-      pointer-events: none;
+    :root{
+      --bg:#f6f8fc;--surface:#ffffff;--surface-soft:#fbfcff;--line:#dde3ee;--line-strong:#cdd6e3;
+      --text:#1d2738;--muted:#667085;--accent:#f7e4a3;--accent-ink:#3c4043;--brand:#fbbc04;
+      --shadow:0 1px 3px rgba(60,64,67,.15),0 4px 8px rgba(60,64,67,.08);--r1:24px;--r2:16px;--r3:12px
     }
-
-    /* ─── Theme base ─── */
-    body { background: #07111e; color: #e2e8f0; min-height: 100vh; transition: background 0.4s; }
-    body.light { background: #f0f4f8; color: #1e293b; }
-
-    /* ─── Glass ─── */
-    .glass {
-      background: rgba(15, 25, 45, 0.72);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(100, 180, 255, 0.12);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
+    body[data-theme="dark"]{
+      --bg:#151a23;--surface:#1e2532;--surface-soft:#1a2230;--line:#2d3748;--line-strong:#364154;
+      --text:#eef2f7;--muted:#a6b0c0;--accent:#4f4a28;--accent-ink:#f7e7a8;--brand:#fbbc04;
+      --shadow:0 1px 3px rgba(0,0,0,.28),0 10px 22px rgba(0,0,0,.18)
     }
-    body.light .glass {
-      background: rgba(255,255,255,0.82);
-      border: 1px solid rgba(37,99,235,0.1);
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);transition:background .2s ease,color .2s ease;overflow-x:hidden}
+    .ambient-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+    .ambient-bg::before{content:"";position:absolute;inset:0;opacity:.98}
+    body[data-theme="dark"] .ambient-bg::before{background:
+      radial-gradient(circle at 18% 16%, rgba(154, 188, 255, .16), transparent 18%),
+      radial-gradient(circle at 76% 24%, rgba(111, 224, 255, .11), transparent 22%),
+      radial-gradient(circle at 52% 82%, rgba(94, 120, 255, .12), transparent 24%),
+      linear-gradient(180deg, #050c18 0%, #0a1330 44%, #111b3b 100%)}
+    body[data-theme="light"] .ambient-bg::before{background:
+      radial-gradient(circle at 18% 16%, rgba(255, 215, 120, .22), transparent 20%),
+      radial-gradient(circle at 76% 24%, rgba(120, 201, 255, .18), transparent 24%),
+      radial-gradient(circle at 52% 82%, rgba(164, 209, 255, .14), transparent 24%),
+      linear-gradient(180deg, #b9e6ff 0%, #dff4ff 38%, #f7fbff 100%)}
+    .ambient-bg::after{content:"";position:absolute;inset:0;animation:driftGlow 22s ease-in-out infinite alternate}
+    body[data-theme="dark"] .ambient-bg::after{background:
+      radial-gradient(circle at center, rgba(255,255,255,.035), transparent 58%),
+      linear-gradient(180deg, transparent 0%, rgba(255,255,255,.018) 100%)}
+    body[data-theme="light"] .ambient-bg::after{background:
+      radial-gradient(circle at center, rgba(255,255,255,.18), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.22) 100%)}
+    .ambient-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:1}
+    .moon,.sun{position:absolute;top:6.5rem;right:9%;border-radius:50%}
+    .moon{width:116px;height:116px;background:
+      radial-gradient(circle at 32% 30%, #fffde8 0%, #f8f0c5 38%, #d6cee4 70%, rgba(214,206,228,.9) 100%);
+      box-shadow:0 0 35px rgba(255,243,190,.3), 0 0 80px rgba(163,190,255,.14)}
+    .moon::before,.moon::after{content:"";position:absolute;border-radius:50%;background:rgba(118,123,152,.16)}
+    .moon::before{width:18px;height:18px;top:24px;left:24px}
+    .moon::after{width:12px;height:12px;bottom:20px;right:24px}
+    .sun{width:124px;height:124px;background:
+      radial-gradient(circle at 34% 32%, #fffbea 0%, #ffe9a8 40%, #ffc85f 72%, rgba(255,190,68,.95) 100%);
+      box-shadow:0 0 40px rgba(255,211,110,.45), 0 0 100px rgba(255,213,127,.25)}
+    .sun::before{content:"";position:absolute;inset:-18px;border-radius:50%;border:2px solid rgba(255,226,154,.38)}
+    .sun::after{content:"";position:absolute;inset:-34px;border-radius:50%;border:2px solid rgba(255,226,154,.18)}
+    .moon-cloud{position:absolute;right:6%;top:10.4rem;width:210px;height:70px;border-radius:999px;background:
+      radial-gradient(circle at 24% 52%, rgba(255,255,255,.12), transparent 20%),
+      radial-gradient(circle at 44% 42%, rgba(255,255,255,.11), transparent 24%),
+      radial-gradient(circle at 66% 58%, rgba(255,255,255,.1), transparent 22%);
+      filter:blur(12px);opacity:.55;animation:cloudDrift 34s ease-in-out infinite}
+    .sun-cloud{position:absolute;right:4%;top:11.2rem;width:240px;height:76px;border-radius:999px;background:
+      radial-gradient(circle at 24% 52%, rgba(255,255,255,.78), transparent 24%),
+      radial-gradient(circle at 44% 42%, rgba(255,255,255,.74), transparent 28%),
+      radial-gradient(circle at 66% 58%, rgba(255,255,255,.68), transparent 24%);
+      filter:blur(10px);opacity:.72;animation:cloudDrift 42s ease-in-out infinite}
+    body[data-theme="dark"] .sun,body[data-theme="dark"] .sun-cloud{display:none}
+    body[data-theme="light"] .moon,body[data-theme="light"] .moon-cloud{display:none}
+    .app,.fab,.modal-back{position:relative;z-index:1}
+    button,input,textarea{font:inherit} button{cursor:pointer;border:0}
+    button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid rgba(251,188,4,.35);outline-offset:2px}
+    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+    .sidebar{background:color-mix(in srgb, var(--surface-soft) 84%, transparent);border-right:1px solid var(--line);padding:1rem 0;position:sticky;top:0;height:100vh;backdrop-filter:blur(16px)}
+    .brand{display:flex;align-items:center;gap:.9rem;padding:0 1.25rem 1rem;border-bottom:1px solid var(--line)}
+    .brand-mark{width:58px;height:58px;display:grid;place-items:center;flex:0 0 auto}
+    .brand-mark svg{width:100%;height:100%;display:block}
+    .brand-copy{display:grid;gap:.12rem}
+    .brand h1{margin:0;font-size:1.5rem;letter-spacing:-.03em}
+    .brand p{margin:0;color:var(--muted);font-size:.88rem;font-weight:600}
+    .nav{display:grid;gap:.35rem;padding:1rem .75rem}
+    .nav button{display:flex;align-items:center;gap:.9rem;padding:.95rem 1rem;border-radius:0 999px 999px 0;background:transparent;color:var(--accent-ink);font-weight:600;text-align:left}
+    .nav button.active{background:var(--accent)}
+    .nav svg{width:22px;height:22px;color:#5f6368;flex:0 0 auto}
+    .main{display:grid;grid-template-rows:auto 1fr}
+    .topbar{display:flex;justify-content:space-between;gap:1rem;align-items:center;padding:1rem 1.5rem;border-bottom:1px solid var(--line);background:color-mix(in srgb, var(--surface-soft) 80%, transparent);backdrop-filter:blur(16px);position:sticky;top:0;z-index:5}
+    .search{position:relative;flex:1;max-width:720px}
+    .search input{width:100%;min-height:52px;padding:0 1rem 0 3rem;border-radius:16px;border:1px solid var(--line);background:var(--surface);color:var(--text)}
+    .search svg{position:absolute;left:1rem;top:50%;transform:translateY(-50%);width:20px;height:20px;color:#757b85}
+    .top-actions{display:flex;gap:.7rem;align-items:center}
+    .btn{min-height:42px;padding:.8rem 1rem;border-radius:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:.45rem;transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-soft{background:color-mix(in srgb, var(--surface) 90%, transparent);border:1px solid color-mix(in srgb, var(--line) 82%, white 18%);color:var(--text);box-shadow:0 10px 24px rgba(15,23,42,.08)}
+    .btn-primary{background:linear-gradient(135deg, #ffe7a3 0%, #ffd978 100%);border:1px solid #f0d071;color:#3f3210;box-shadow:0 14px 26px rgba(255,211,104,.22)}
+    .content{padding:1.25rem 1.5rem 2.5rem}
+    .page{display:none;animation:fade .18s ease}
+    .page.active{display:block}
+    .composer{max-width:760px;margin:0 auto 1.5rem;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+    .composer.collapsed .composer-extra{display:none}
+    .composer-top{display:flex;align-items:center;gap:.75rem;padding:.9rem 1rem}
+    .composer-top input{flex:1;border:0;min-width:0;font-size:1.05rem;background:transparent}
+    .composer-top .icon-btn{box-shadow:none}
+    .composer-extra{padding:0 1rem 1rem;display:grid;gap:.8rem}
+    .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+    .field{display:grid;gap:.4rem}
+    .field label{font-size:.82rem;font-weight:800;color:#576277;letter-spacing:.04em;text-transform:uppercase}
+    .field input,.field textarea,.field select{width:100%;padding:.92rem 1rem;border-radius:16px;border:1px solid color-mix(in srgb, var(--line) 80%, white 20%);background:color-mix(in srgb, var(--surface) 92%, transparent);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 6px 18px rgba(15,23,42,.04);transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease}
+    .field textarea{min-height:110px;resize:vertical}
+    .field input:hover,.field textarea:hover,.field select:hover{border-color:color-mix(in srgb, var(--line-strong) 85%, white 15%)}
+    .field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(255,206,92,.72);box-shadow:0 0 0 4px rgba(255,213,104,.18),0 10px 22px rgba(15,23,42,.06)}
+    .helper{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:.9rem;color:var(--muted);min-height:1.2rem}
+    .warn{color:#d93025;font-weight:600}
+    .toolbar{display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap}
+    .toolbar .left,.toolbar .right{display:flex;gap:.65rem;align-items:center;flex-wrap:wrap}
+    .icon-btn{width:40px;height:40px;border-radius:10px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:#5f6368;box-shadow:var(--shadow)}
+    .icon-btn svg{width:20px;height:20px}
+    .tool-chip{display:inline-flex;align-items:center;gap:.45rem;padding:.5rem .8rem;border-radius:999px;background:#f1f3f4;color:#5f6368;font-size:.85rem;font-weight:600;border:1px solid var(--line)}
+    .checklist-panel{display:none;gap:.75rem}
+    .checklist-panel.show{display:grid}
+    .checklist-add{display:flex;gap:.6rem;align-items:center}
+    .checklist-add input{flex:1;min-width:0}
+    .checklist-list{display:grid;gap:.55rem}
+    .check-item{display:grid;grid-template-columns:auto 1fr auto;gap:.65rem;align-items:center;padding:.7rem .8rem;border-radius:12px;border:1px solid var(--line);background:var(--surface-soft)}
+    .check-item.done span{text-decoration:line-through;opacity:.68}
+    .check-item input{width:18px;height:18px;accent-color:#34a853}
+    .check-item button{width:32px;height:32px;border-radius:8px;background:transparent;color:#6b7280}
+    .check-note-list{display:grid;gap:.4rem}
+    .check-note-row{display:grid;grid-template-columns:auto 1fr;gap:.65rem;align-items:start;color:#374151}
+    .check-note-row input{width:18px;height:18px;accent-color:#34a853;margin-top:.15rem}
+    .check-summary{padding-top:.65rem;border-top:1px solid rgba(125,138,164,.2);color:#6b7280;font-size:.9rem}
+    .mini-tools{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+    .overview-page-shell{display:grid;gap:1rem}
+    .overview-section{max-width:1280px;margin:0 auto 1.25rem;padding:1rem;border:1px solid var(--line);border-radius:20px;background:color-mix(in srgb, var(--surface) 88%, transparent);box-shadow:var(--shadow);backdrop-filter:blur(14px);display:grid;grid-template-columns:minmax(0,1.7fr) 340px;gap:1rem;align-items:stretch}
+    .overview-main{min-width:0}
+    .overview-side{display:grid;gap:1rem;align-content:start}
+    .notes-header{max-width:100%;margin:0 0 1rem}
+    .notes-header h2{margin:0;font-size:1.5rem;letter-spacing:-.02em}
+    .notes-header p{margin:.35rem 0 0;color:var(--muted)}
+    .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem;margin:1rem 0 0}
+    .metric{background:color-mix(in srgb, var(--surface) 86%, transparent);border:1px solid var(--line);border-radius:16px;padding:1rem;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+    .metric span{display:block;color:var(--muted);font-size:.88rem}
+    .metric strong{display:block;margin-top:.35rem;font-size:1.35rem}
+    .side-card{background:color-mix(in srgb, var(--surface) 88%, transparent);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(12px);padding:1rem}
+    .side-card h3{margin:0;font-size:1.05rem;letter-spacing:-.02em}
+    .side-card p{margin:.35rem 0 0;color:var(--muted);font-size:.92rem;line-height:1.5}
+    .clock-card{display:grid;gap:.75rem;align-content:start}
+    .clock-time{font-size:2rem;font-weight:800;letter-spacing:-.04em;line-height:1}
+    .clock-date{color:var(--muted);font-weight:600}
+    .clock-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+    .clock-pill{padding:.8rem .9rem;border-radius:14px;background:var(--surface-soft);border:1px solid var(--line)}
+    .clock-pill span{display:block;color:var(--muted);font-size:.8rem}
+    .clock-pill strong{display:block;margin-top:.3rem;font-size:1rem}
+    .overview-links{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1rem}
+    .overview-link{padding:1rem 1.1rem;border-radius:18px;border:1px solid var(--line);background:color-mix(in srgb, var(--surface) 88%, transparent);box-shadow:var(--shadow);backdrop-filter:blur(12px);display:grid;gap:.45rem;text-align:left;color:var(--text)}
+    .overview-link strong{font-size:1.02rem}
+    .overview-link span{color:var(--muted);font-size:.9rem;line-height:1.45}
+    .overview-link:hover{transform:translateY(-2px)}
+    .section-label{font-size:.85rem;font-weight:700;letter-spacing:.08em;color:#6b7280;margin:1rem auto .7rem;max-width:980px}
+    .notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:1rem;align-items:start}
+    .note-card{background:color-mix(in srgb, var(--surface) 88%, transparent);border:1px solid var(--line-strong);border-radius:18px;padding:1rem;box-shadow:0 10px 28px rgba(15,23,42,.08);display:flex;flex-direction:column;gap:.7rem;position:relative;cursor:pointer;backdrop-filter:blur(12px)}
+    .note-card:hover{box-shadow:0 8px 18px rgba(60,64,67,.14)}
+    .note-card img{width:100%;max-height:220px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+    .note-head{display:flex;justify-content:space-between;gap:.75rem;align-items:flex-start}
+    .note-head h3{margin:0;font-size:1.2rem;line-height:1.3;word-break:break-word}
+    .chip{display:inline-flex;align-items:center;padding:.3rem .6rem;border-radius:999px;background:#f1f3f4;color:#5f6368;font-size:.78rem;font-weight:700}
+    .note-body{margin:0;color:#374151;white-space:pre-wrap;word-break:break-word;line-height:1.6}
+    .note-tools{display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap;padding-top:.2rem}
+    .note-foot{display:flex;justify-content:space-between;align-items:center;gap:.75rem;flex-wrap:wrap;color:#6b7280;font-size:.85rem}
+    .card-actions{display:flex;gap:.45rem;flex-wrap:wrap}
+    .menu-wrap{position:relative}
+    .note-menu{position:absolute;right:0;top:calc(100% + .35rem);min-width:210px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 28px rgba(60,64,67,.16);padding:.4rem;display:none;z-index:3}
+    .note-menu.show{display:grid}
+    .note-menu button{display:flex;width:100%;padding:.75rem .85rem;border-radius:10px;background:transparent;color:var(--text);text-align:left}
+    .note-menu button:hover{background:var(--surface-soft)}
+    .note-actionbar{display:flex;justify-content:space-between;gap:1rem;align-items:center;flex-wrap:wrap;padding-top:.3rem}
+    .note-action-left,.note-action-right{display:flex;gap:.55rem;align-items:center;flex-wrap:wrap}
+    .action-icon{width:42px;height:42px;border-radius:14px;background:color-mix(in srgb, var(--surface-soft) 80%, transparent);border:1px solid color-mix(in srgb, var(--line) 78%, white 22%);display:grid;place-items:center;color:#616b7d;box-shadow:0 8px 18px rgba(15,23,42,.06)}
+    .action-icon.active{background:#fff4c1;border-color:#f0d071;color:#574500}
+    .action-icon svg{width:18px;height:18px}
+    .action-close{padding:.8rem 1rem;border-radius:14px;background:transparent;color:var(--text);font-weight:700}
+    .action-menu{min-width:220px}
+    .empty{padding:2rem 1rem;text-align:center;color:var(--muted);border:1px dashed var(--line-strong);border-radius:16px;background:var(--surface)}
+    .todo-shell,.analytics-shell,.motivate-shell,.workout-shell,.calorie-shell,.health-shell{display:grid;gap:1rem}
+    .stack-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+    .workout-list,.calorie-list{display:grid;gap:.85rem}
+    .workout-card,.calorie-card,.health-note{padding:1rem;border-radius:18px;background:color-mix(in srgb, var(--surface) 90%, transparent);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;gap:.75rem;backdrop-filter:blur(12px)}
+    .workout-head,.calorie-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;flex-wrap:wrap}
+    .workout-head h3,.calorie-head h3{margin:0;font-size:1.1rem;line-height:1.35}
+    .workout-meta,.calorie-meta{display:flex;gap:.5rem;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
+    .workout-note,.calorie-note{margin:0;color:var(--muted);line-height:1.55;white-space:pre-wrap}
+    .split-chip{display:inline-flex;align-items:center;padding:.38rem .7rem;border-radius:999px;background:#fff4c1;color:#6f5300;font-weight:700;font-size:.8rem;border:1px solid #f0d071}
+    .inline-pills{display:flex;gap:.55rem;flex-wrap:wrap}
+    .inline-pills .badge{font-size:.82rem;padding:.38rem .7rem}
+    .health-highlights{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+    .health-hero{display:grid;gap:1rem}
+    .health-value{font-size:2.2rem;font-weight:800;letter-spacing:-.04em;line-height:1}
+    .health-sub{color:var(--muted);font-weight:600}
+    .range-meter{height:12px;border-radius:999px;background:color-mix(in srgb, var(--surface-soft) 78%, transparent);overflow:hidden;border:1px solid var(--line)}
+    .range-meter span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#7ecbff 0%,#fbbc04 52%,#ff986c 100%)}
+    .calorie-insight{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+    .subtle{color:var(--muted);font-size:.92rem;line-height:1.55}
+    .btn-danger,.danger{background:#fee2e2;border:1px solid #fecaca;color:#b42318}
+    .analytics-header{display:grid;gap:.35rem}
+    .analytics-header h2{margin:0;font-size:1.6rem;letter-spacing:-.02em}
+    .analytics-header p{margin:0;color:var(--muted)}
+    .panel{background:color-mix(in srgb, var(--surface) 88%, transparent);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:1rem;backdrop-filter:blur(14px)}
+    .head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;flex-wrap:wrap;margin-bottom:1rem}
+    .head h2{margin:0;font-size:1.4rem}.head p{margin:.35rem 0 0;color:var(--muted)}
+    .tabs{display:flex;gap:.55rem;flex-wrap:wrap}
+    .tabs button{padding:.72rem 1rem;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-weight:600;color:var(--text)}
+    .tabs button.active{background:#fff4c1;border-color:#f0dda0}
+    .todo-list{display:grid;gap:.85rem}
+    .todo-card{display:grid;grid-template-columns:auto 1fr auto;gap:.9rem;align-items:start;border:1px solid var(--line);border-radius:14px;padding:1rem;background:var(--surface)}
+    .todo-card.done-item strong,.todo-card.done-item p{text-decoration:line-through;opacity:.7}
+    .check{width:20px;height:20px;accent-color:#34a853;margin-top:.2rem}
+    .todo-main{display:grid;gap:.45rem}.todo-main strong{font-size:1rem;line-height:1.35}
+    .todo-main p{margin:0;color:var(--muted);font-size:.92rem}
+    .badges{display:flex;gap:.45rem;flex-wrap:wrap}.badge{padding:.32rem .6rem;border-radius:999px;font-size:.78rem;font-weight:700}
+    .badge.open{background:#e8f0fe;color:#3467d6}.badge.done{background:#e6f4ea;color:#188038}.badge.due{background:#fef3c7;color:#9a6700}
+    .summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.8rem}
+    .sum{padding:1rem;border-radius:16px;background:color-mix(in srgb, var(--surface) 86%, transparent);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+    .sum span{display:block;color:var(--muted);font-size:.9rem}.sum strong{display:block;margin-top:.35rem;font-size:1.55rem}
+    .charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+    .chart{padding:1rem;border-radius:18px;background:color-mix(in srgb, var(--surface) 90%, transparent);border:1px solid var(--line);box-shadow:var(--shadow);display:grid;gap:.8rem;align-content:start;backdrop-filter:blur(14px)}
+    .chart canvas{width:100%!important;height:220px!important}
+    table{width:100%;border-collapse:collapse} th,td{text-align:left;padding:.7rem;border-bottom:1px solid var(--line)} th{font-size:.85rem;color:var(--muted)}
+    .analytics-top{display:grid;grid-template-columns:1fr;gap:1rem;align-items:center}
+    .cube{width:72px;height:72px;position:relative;transform-style:preserve-3d;animation:spin 14s linear infinite}
+    .cube-face{position:absolute;inset:0;border-radius:16px;display:grid;place-items:center;background:linear-gradient(145deg,#f6a48d,#8caefb);color:#fff;font-weight:800;border:1px solid rgba(255,255,255,.4)}
+    .cube-face:nth-child(1){transform:translateZ(36px)} .cube-face:nth-child(2){transform:rotateY(180deg) translateZ(36px)}
+    .cube-face:nth-child(3){transform:rotateY(90deg) translateZ(36px)} .cube-face:nth-child(4){transform:rotateY(-90deg) translateZ(36px)}
+    .cube-face:nth-child(5){transform:rotateX(90deg) translateZ(36px)} .cube-face:nth-child(6){transform:rotateX(-90deg) translateZ(36px)}
+    .spoken{width:100%;min-height:110px;padding:1rem;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);resize:none}
+    .form-actions{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.8rem}
+    .switch-row{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+    .switch{display:inline-flex;gap:.55rem;align-items:center;font-weight:600;color:var(--text)}
+    .switch input{width:18px;height:18px;accent-color:#fbbc04}
+    .modal-back{position:fixed;inset:0;display:none;place-items:center;padding:1rem;background:rgba(12,18,31,.38);backdrop-filter:blur(10px);z-index:20}
+    .modal-back.open{display:grid}
+    .modal{position:relative;width:min(100%,760px);background:linear-gradient(180deg, color-mix(in srgb, var(--surface) 95%, white 5%), color-mix(in srgb, var(--surface) 90%, transparent));border:1px solid color-mix(in srgb, var(--line) 76%, white 24%);border-radius:28px;box-shadow:0 28px 70px rgba(8,14,28,.26);padding:1.2rem;overflow:hidden}
+    .modal::before{content:"";position:absolute;left:18px;right:18px;top:0;height:4px;border-radius:999px;background:linear-gradient(90deg, rgba(255,217,120,.88), rgba(132,202,255,.7))}
+    .modal-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;margin-bottom:1.15rem;padding-top:.3rem}
+    .modal-head h2{margin:0;font-size:1.9rem;letter-spacing:-.03em}
+    .modal-head p{margin:.45rem 0 0;color:var(--muted);font-size:1rem;line-height:1.55;max-width:42ch}
+    .close{width:52px;height:52px;border-radius:18px;background:color-mix(in srgb, var(--surface-soft) 84%, transparent);color:#6b7280;border:1px solid color-mix(in srgb, var(--line) 76%, white 24%);box-shadow:0 10px 24px rgba(15,23,42,.08)}
+    .close:hover{transform:translateY(-1px)}
+    #noteEditForm,#todoEditForm{display:grid;gap:1rem}
+    #noteEditForm .grid2{gap:1rem}
+    #noteEditForm .helper,#todoEditForm .helper{align-items:center}
+    .form-actions{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.8rem;padding-top:.9rem;border-top:1px solid color-mix(in srgb, var(--line) 74%, white 26%)}
+    .fab{position:fixed;right:1.2rem;bottom:1.2rem;width:58px;height:58px;border-radius:50%;display:none;place-items:center;background:#fff4c1;color:#574500;box-shadow:var(--shadow);font-size:1.8rem}
+    @media (max-width:1080px){.app{grid-template-columns:88px 1fr}.brand-copy,.nav span{display:none}.brand{justify-content:center}.topbar{padding:1rem}.summary,.charts,.stack-grid,.health-highlights,.calorie-insight{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:760px){
+      .app{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line)}.nav{grid-template-columns:repeat(auto-fit,minmax(92px,1fr));padding:.75rem}.nav button{justify-content:center;border-radius:16px;padding:.85rem}.nav svg{margin:0}
+      .topbar{padding:1rem}.content{padding:1rem 1rem 5rem}.overview-section,.grid2,.summary,.charts,.analytics-top,.stats-row,.clock-grid,.overview-links,.stack-grid,.health-highlights,.calorie-insight{grid-template-columns:1fr}.hero-buttons{justify-content:flex-start}.todo-card{grid-template-columns:auto 1fr}.todo-card .card-actions{grid-column:1/-1}
+      .fab{display:grid}
     }
-
-    /* ─── Color dot (FIXED: was missing) ─── */
-    .color-dot {
-      width: 24px; height: 24px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: transform 0.15s, border-color 0.15s;
-    }
-    .color-dot:hover { transform: scale(1.25); border-color: #38bdf8; }
-    .color-dot.active { border-color: #38bdf8; transform: scale(1.2); }
-
-    /* ─── Note card ─── */
-    .note-card {
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      break-inside: avoid;
-      border: 1px solid rgba(100,180,255,0.1);
-    }
-    .note-card:hover {
-      transform: translateY(-5px) rotateX(2deg);
-      box-shadow: 0 16px 40px rgba(56,189,248,0.18);
-      border-color: rgba(56,189,248,0.3);
-    }
-
-    /* ─── Task card ─── */
-    .task-card {
-      transition: transform 0.2s, box-shadow 0.2s;
-      border: 1px solid rgba(100,180,255,0.1);
-    }
-    .task-card:hover { transform: translateX(4px); box-shadow: 0 6px 20px rgba(56,189,248,0.12); }
-
-    /* ─── Stat card ─── */
-    .stat-card {
-      transition: transform 0.2s, box-shadow 0.2s;
-      border: 1px solid rgba(56,189,248,0.15);
-    }
-    .stat-card:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(56,189,248,0.2); }
-
-    /* ─── Trash item ─── */
-    .trash-item {
-      border-left: 3px solid #ef4444;
-      background: rgba(239,68,68,0.05);
-      border: 1px solid rgba(239,68,68,0.2);
-      transition: box-shadow 0.2s;
-    }
-    .trash-item:hover { box-shadow: 0 6px 20px rgba(239,68,68,0.15); }
-
-    /* ─── Sidebar ─── */
-    .sidebar-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 14px; border-radius: 8px;
-      font-size: 14px; font-weight: 500;
-      color: #94a3b8;
-      transition: all 0.18s ease;
-      cursor: pointer; text-decoration: none;
-    }
-    .sidebar-item:hover { background: rgba(56,189,248,0.1); color: #38bdf8; transform: translateX(3px); }
-    .sidebar-item.active {
-      background: rgba(56,189,248,0.15);
-      color: #38bdf8;
-      border-left: 3px solid #38bdf8;
-      padding-left: 11px;
-    }
-    body.light .sidebar-item { color: #475569; }
-    body.light .sidebar-item:hover { color: #2563eb; background: rgba(37,99,235,0.08); }
-    body.light .sidebar-item.active { color: #2563eb; border-color: #2563eb; background: rgba(37,99,235,0.1); }
-
-    /* ─── Tab buttons ─── */
-    .tab-btn {
-      position: relative; padding: 10px 18px; border-radius: 8px;
-      font-size: 14px; font-weight: 500; color: #64748b;
-      background: none; border: none; cursor: pointer;
-      transition: all 0.18s;
-      white-space: nowrap;
-    }
-    .tab-btn:hover { color: #38bdf8; background: rgba(56,189,248,0.08); }
-    .tab-btn.active { color: #38bdf8; background: rgba(56,189,248,0.15); }
-    .tab-btn::after {
-      content: ''; position: absolute; bottom: 0; left: 18px; right: 18px;
-      height: 2px; background: #38bdf8;
-      transform: scaleX(0); transition: transform 0.2s;
-    }
-    .tab-btn.active::after { transform: scaleX(1); }
-    body.light .tab-btn { color: #64748b; }
-    body.light .tab-btn.active { color: #2563eb; background: rgba(37,99,235,0.08); }
-    body.light .tab-btn::after { background: #2563eb; }
-
-    /* ─── Masonry ─── */
-    .masonry-grid { column-gap: 1rem; }
-    @media (min-width: 640px)  { .masonry-grid { column-count: 2; } }
-    @media (min-width: 768px)  { .masonry-grid { column-count: 3; } }
-    @media (min-width: 1024px) { .masonry-grid { column-count: 4; } }
-    @media (min-width: 1280px) { .masonry-grid { column-count: 5; } }
-    .list-view .masonry-grid  { column-count: 1 !important; }
-
-    /* ─── Modal ─── */
-    .modal-enter { animation: modalPop 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
-    @keyframes modalPop {
-      from { opacity:0; transform:scale(0.6) rotateX(-15deg); }
-      to   { opacity:1; transform:scale(1) rotateX(0); }
-    }
-
-    /* ─── Fade in ─── */
-    .fade-in { animation: fadeIn 0.3s ease both; }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
-
-    /* ─── Buttons ─── */
-    button { transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1); }
-    button:hover { transform: translateY(-2px); }
-    button:active { transform: translateY(0); }
-
-    /* ─── Mobile ─── */
-    @media (max-width: 768px) {
-      .tab-btn .tab-text { display: none; }
-      aside {
-        position: fixed; top:0; left:0; width:80vw; max-width:300px;
-        height:100%; z-index:50; transform:translateX(-110%);
-        transition:transform 0.25s ease;
-      }
-      aside.open { transform:translateX(0); }
-    }
-
-    /* ─── Input styles ─── */
-    input[type=text], textarea {
-      color: inherit;
-    }
-    body.light input[type=text],
-    body.light textarea { color: #1e293b; }
-    body.light input::placeholder,
-    body.light textarea::placeholder { color: #94a3b8; }
-
-    /* ─── Quick stats strip ─── */
-    .quick-stat { text-align:center; padding:8px 0; }
-    .quick-stat .val { font-size:1.4rem; font-weight:700; color:#38bdf8; }
-    .quick-stat .lbl { font-size:0.65rem; color:#64748b; text-transform:uppercase; letter-spacing:.05em; }
-    body.light .quick-stat .val { color:#2563eb; }
-
-    /* ─── Scrollbar ─── */
-    ::-webkit-scrollbar { width:5px; }
-    ::-webkit-scrollbar-track { background:transparent; }
-    ::-webkit-scrollbar-thumb { background:rgba(56,189,248,0.3); border-radius:9px; }
+    @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+    @keyframes spin{0%{transform:rotateX(-16deg) rotateY(0)}50%{transform:rotateX(14deg) rotateY(180deg)}100%{transform:rotateX(-16deg) rotateY(360deg)}}
+    @keyframes cloudDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(-34px)}}
+    @keyframes driftGlow{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(2%, -1.5%, 0) scale(1.06)}}
+    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
   </style>
 </head>
 <body>
-
-<!-- ═══ CANVAS BACKGROUND ═══ -->
-<canvas id="bgCanvas"></canvas>
-
-<!-- ═══ HEADER ═══ -->
-<header class="sticky top-0 z-40 glass border-b border-white/5">
-  <div class="container mx-auto px-4 py-3 flex items-center gap-3">
-
-    <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg hover:bg-white/10 text-slate-300">
-      <i class="fas fa-bars text-lg"></i>
-    </button>
-
-    <div class="flex items-center gap-2 shrink-0">
-      <div class="w-9 h-9 rounded-lg flex items-center justify-center"
-           style="background:linear-gradient(135deg,#38bdf8,#0ea5e9)">
-        <span class="text-white font-bold">A</span>
+  <div class="ambient-bg" aria-hidden="true">
+    <canvas id="ambientCanvas" class="ambient-canvas"></canvas>
+    <div class="moon"></div>
+    <div class="moon-cloud"></div>
+    <div class="sun"></div>
+    <div class="sun-cloud"></div>
+  </div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none">
+            <path d="M18 14c10-4 24-1 31 8 7 9 6 22-1 31-9 11-26 14-38 6C-2 50-2 29 18 14Z" fill="#52E0DD"></path>
+            <path d="M47 14c10 4 16 14 15 25-1 11-10 20-22 23-12 3-25-1-31-10 14 2 24-5 30-14 6-8 8-16 8-24Z" fill="#2BA8B4" opacity=".95"></path>
+            <path d="M14 36 29 18h8l15 18h-10l-9-11-9 11H14Z" fill="#233A53"></path>
+            <path d="M23 50 33 28l10 22h-9l-2-5h-2l-2 5h-5Z" fill="#233A53"></path>
+            <path d="M31.2 40h2.4L32.4 36l-1.2 4Z" fill="#ffffff"></path>
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <h1>Ashvinz</h1>
+          <p>Notes & Productivity</p>
+        </div>
       </div>
-      <h1 class="text-lg font-bold text-white hidden sm:block">Ashvinz Notes</h1>
-    </div>
+      <nav class="nav" aria-label="App sections">
+        <button class="nav-btn active" data-page="overview-page" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-5H9v5H5a1 1 0 0 1-1-1v-8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <span>Overview</span>
+        </button>
+        <button class="nav-btn" data-page="notes-page" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 3h6l4 4v12a2 2 0 0 1-2 2H9a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4Z" stroke="currentColor" stroke-width="1.8"/><path d="M9 10h6M9 14h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span>Notes</span>
+        </button>
+        <button class="nav-btn" data-page="todo-page" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 7h10M9 12h10M9 17h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="m4 7 1.5 1.5L7.8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="m4 12 1.5 1.5L7.8 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Todo List</span>
+        </button>
+        <button class="nav-btn" data-page="workout-page" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 10h4v4H3v-4Zm14 0h4v4h-4v-4ZM7 11h10M7 13h10M7 8V6m10 2V6m-10 12v-2m10 2v-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Workout</span>
+        </button>
+        <button class="nav-btn" data-page="calories-page" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3c2.8 2.2 5 5.3 5 8.8A5 5 0 0 1 12 17a5 5 0 0 1-5-5.2C7 8.3 9.2 5.2 12 3Z" stroke="currentColor" stroke-width="1.8"/><path d="M12 8c1 1 2 2.4 2 4a2 2 0 1 1-4 0c0-1.6 1-3 2-4Z" stroke="currentColor" stroke-width="1.8"/></svg>
+          <span>Calories</span>
+        </button>
+        <button class="nav-btn" data-page="health-page" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-6.5-4.3-8.5-8A4.9 4.9 0 0 1 8 5c1.8 0 3 1 4 2.3C13 6 14.2 5 16 5a4.9 4.9 0 0 1 4.5 7c-2 3.7-8.5 8-8.5 8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+          <span>Health & BMI</span>
+        </button>
+        <button class="nav-btn" data-page="analytics-page" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 19V9M12 19V5M19 19v-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 19h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span>Analytics</span>
+        </button>
+        <button class="nav-btn" data-page="motivate-page" type="button">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3c3.3 0 6 2.7 6 6 0 2.2-1.2 4-3 5v2h-6v-2c-1.8-1-3-2.8-3-5 0-3.3 2.7-6 6-6Z" stroke="currentColor" stroke-width="1.8"/><path d="M10 20h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span>Motivate Me</span>
+        </button>
+      </nav>
+    </aside>
 
-    <div class="flex-1 max-w-xl mx-2 hidden md:block">
-      <div class="relative">
-        <input id="searchInput" type="text" placeholder="Search notes…"
-          class="w-full py-2 pl-9 pr-4 rounded-lg bg-white/8 border border-white/10
-                 focus:outline-none focus:ring-1 focus:ring-sky-400 text-sm
-                 placeholder-slate-400 text-slate-100">
-        <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-sm"></i>
+    <main class="main">
+      <header class="topbar">
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M10.5 18a7.5 7.5 0 1 1 5.3-2.2L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <input id="globalSearch" type="search" placeholder="Search notes by title, label, or content">
+        </div>
+        <div class="top-actions">
+          <button id="themeBtn" class="btn btn-soft" type="button">Light theme</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <section id="overview-page" class="page active">
+          <div class="overview-page-shell">
+            <div class="overview-section" aria-label="Overview section">
+            <div class="overview-main">
+              <div class="notes-header">
+                <h2 id="notesHeading">Aswin Notes</h2>
+                <p>Daily notes for learning, upskilling, better job productivity, and staying focused instead of wasting time.</p>
+              </div>
+
+              <div class="stats-row" aria-label="Overview">
+                <div class="metric"><span>Total notes</span><strong id="noteCount">0</strong></div>
+                <div class="metric"><span>Total tasks</span><strong id="taskCount">0</strong></div>
+                <div class="metric"><span>Completed tasks</span><strong id="doneCount">0</strong></div>
+                <div class="metric"><span>Due today</span><strong id="todayCount">0</strong></div>
+                <div class="metric"><span>Workouts this week</span><strong id="workoutWeekCount">0</strong></div>
+                <div class="metric"><span>Deficit today</span><strong id="deficitTodayStat">0 kcal</strong></div>
+              </div>
+            </div>
+
+            <aside class="overview-side" aria-label="Clock and date">
+              <section class="side-card clock-card" aria-label="Clock and date">
+                <div>
+                  <h3>Clock</h3>
+                  <p>Live time with full day, date, month, and year.</p>
+                </div>
+                <div id="clockTime" class="clock-time">00:00:00</div>
+                <div id="clockDate" class="clock-date">Loading date...</div>
+                <div class="clock-grid">
+                  <div class="clock-pill"><span>Day</span><strong id="clockDay">-</strong></div>
+                  <div class="clock-pill"><span>Month</span><strong id="clockMonth">-</strong></div>
+                  <div class="clock-pill"><span>Date</span><strong id="clockDateNum">-</strong></div>
+                  <div class="clock-pill"><span>Year</span><strong id="clockYear">-</strong></div>
+                </div>
+              </section>
+              <section class="side-card" aria-label="Health snapshot">
+                <h3>Health Snapshot</h3>
+                <p>Daily calorie target, current intake, and BMI at a glance.</p>
+                <div class="clock-grid">
+                  <div class="clock-pill"><span>Target calories</span><strong id="healthTargetCalories">0</strong></div>
+                  <div class="clock-pill"><span>Calories today</span><strong id="healthCaloriesToday">0</strong></div>
+                  <div class="clock-pill"><span>Net today</span><strong id="healthNetToday">0</strong></div>
+                  <div class="clock-pill"><span>BMI</span><strong id="bmiOverview">-</strong></div>
+                </div>
+              </section>
+            </aside>
+          </div>
+            <div class="overview-links" aria-label="Overview shortcuts">
+              <button class="overview-link" type="button" data-open-page="notes-page"><strong>Notes</strong><span>Capture daily learning notes, labels, checklists, and pinned ideas.</span></button>
+              <button class="overview-link" type="button" data-open-page="todo-page"><strong>Todo List</strong><span>Manage your tasks, due dates, and focus on what should be done next.</span></button>
+              <button class="overview-link" type="button" data-open-page="workout-page"><strong>Workout Split</strong><span>Log push, pull, legs, and other gym sessions with duration and calories burned.</span></button>
+              <button class="overview-link" type="button" data-open-page="calories-page"><strong>Calories Tracker</strong><span>Track daily calories, food notes, net calories, and your running calorie deficit.</span></button>
+              <button class="overview-link" type="button" data-open-page="health-page"><strong>Health & BMI</strong><span>Save weight, height, maintenance calories, target deficit, and BMI in one place.</span></button>
+              <button class="overview-link" type="button" data-open-page="analytics-page"><strong>Analytics</strong><span>Check weekly activity, monthly summaries, and completion progress clearly.</span></button>
+              <button class="overview-link" type="button" data-open-page="motivate-page"><strong>Motivate Me</strong><span>Get spoken motivation and quick encouragement while you work and learn.</span></button>
+            </div>
+          </div>
+        </section>
+
+        <section id="notes-page" class="page">
+
+          <div id="noteComposer" class="composer collapsed">
+            <div class="composer-top">
+              <input id="quickNoteTitle" type="text" placeholder="Take a note...">
+              <button id="checklistToggleBtn" class="icon-btn" type="button" aria-label="Add checklist">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M9 7h10M9 12h10M9 17h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="m4 7 1.5 1.5L7.8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="m4 12 1.5 1.5L7.8 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              <button id="pinToggleBtn" class="icon-btn" type="button" aria-label="Pin note">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M8 4h8l-2 5v4l3 2v1H7v-1l3-2V9L8 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <div class="composer-extra">
+              <div class="grid2">
+                <div class="field">
+                  <label for="notesBoardName">Notes section name</label>
+                  <input id="notesBoardName" type="text" maxlength="50" placeholder="Aswin Notes">
+                </div>
+                <div class="field">
+                  <label for="quickNoteLabel">Note label</label>
+                  <input id="quickNoteLabel" type="text" maxlength="40" placeholder="Work, Personal, Study...">
+                </div>
+              </div>
+              <div class="field">
+                <label for="quickNoteBody">Content</label>
+                <textarea id="quickNoteBody" maxlength="5000" placeholder="Write your note..."></textarea>
+              </div>
+              <div id="checklistPanel" class="checklist-panel">
+                <div class="mini-tools">
+                  <span class="tool-chip">Checklist items</span>
+                </div>
+                <div class="checklist-add">
+                  <input id="quickChecklistInput" type="text" maxlength="120" placeholder="Add checklist item">
+                  <button id="addChecklistItemBtn" class="btn btn-soft" type="button">Add item</button>
+                </div>
+                <div id="quickChecklistList" class="checklist-list"></div>
+              </div>
+              <div class="helper"><span id="noteWarn" class="warn"></span><span id="noteMeta">0 / 5000 characters</span></div>
+              <div class="toolbar">
+                <div class="left"></div>
+                <div class="right">
+                  <button id="clearComposerBtn" class="btn btn-soft" type="button">Clear</button>
+                  <button id="saveNoteBtn" class="btn btn-primary" type="button">Add note</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-label">PINNED</div>
+          <div id="pinnedNotes" class="notes-grid"></div>
+          <div class="section-label">OTHERS</div>
+          <div id="otherNotes" class="notes-grid"></div>
+        </section>
+
+        <section id="todo-page" class="page">
+          <div class="todo-shell">
+            <div class="panel">
+              <div class="head">
+                <div><h2>Todo List</h2><p>Add tasks, due dates, and manage them in a clean list.</p></div>
+                <div class="tabs">
+                  <button class="todo-tab active" data-view="all" type="button">All tasks</button>
+                  <button class="todo-tab" data-view="today" type="button">Today</button>
+                </div>
+              </div>
+              <form id="todoForm" novalidate>
+                <div class="grid2">
+                  <div class="field">
+                    <label for="todoText">Task description</label>
+                    <input id="todoText" type="text" maxlength="180" placeholder="Review deck, buy groceries, publish update..." required>
+                  </div>
+                  <div class="field">
+                    <label for="todoDate">Due date</label>
+                    <input id="todoDate" type="date">
+                  </div>
+                </div>
+                <div class="helper"><span id="todoWarn" class="warn"></span><span>Tasks are stored locally in your browser.</span></div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" type="submit">Add task</button>
+                  <button id="clearTodoBtn" class="btn btn-soft" type="button">Clear</button>
+                </div>
+              </form>
+            </div>
+            <div id="todoList" class="todo-list"></div>
+          </div>
+        </section>
+
+        <section id="workout-page" class="page">
+          <div class="workout-shell">
+            <div class="panel">
+              <div class="head">
+                <div><h2>Workout Split</h2><p>Track your gym routine with push, pull, legs, and other sessions you use during the week.</p></div>
+              </div>
+              <form id="workoutForm" novalidate>
+                <div class="grid2">
+                  <div class="field">
+                    <label for="workoutDate">Workout date</label>
+                    <input id="workoutDate" type="date">
+                  </div>
+                  <div class="field">
+                    <label for="workoutSplit">Workout split</label>
+                    <select id="workoutSplit">
+                      <option value="Push">Push</option>
+                      <option value="Pull">Pull</option>
+                      <option value="Legs">Legs</option>
+                      <option value="Upper Body">Upper Body</option>
+                      <option value="Lower Body">Lower Body</option>
+                      <option value="Core">Core</option>
+                      <option value="Cardio">Cardio</option>
+                      <option value="Recovery">Recovery</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid2">
+                  <div class="field">
+                    <label for="workoutName">Workout name</label>
+                    <input id="workoutName" type="text" maxlength="120" placeholder="Push day chest and shoulders">
+                  </div>
+                  <div class="field">
+                    <label for="workoutDuration">Duration (minutes)</label>
+                    <input id="workoutDuration" type="number" min="0" max="300" placeholder="60">
+                  </div>
+                </div>
+                <div class="grid2">
+                  <div class="field">
+                    <label for="workoutBurn">Calories burned</label>
+                    <input id="workoutBurn" type="number" min="0" max="3000" placeholder="320">
+                  </div>
+                  <div class="field">
+                    <label for="workoutNotes">Workout note</label>
+                    <input id="workoutNotes" type="text" maxlength="180" placeholder="Incline bench, rows, squats...">
+                  </div>
+                </div>
+                <div class="switch-row">
+                  <label class="switch"><input id="workoutCompleted" type="checkbox" checked> Mark session completed</label>
+                </div>
+                <div class="helper"><span id="workoutWarn" class="warn"></span><span>Use this section for your gym split and calorie burn tracking.</span></div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" type="submit">Add workout</button>
+                  <button id="clearWorkoutBtn" class="btn btn-soft" type="button">Clear</button>
+                </div>
+              </form>
+            </div>
+            <div class="summary">
+              <div class="sum"><span>Sessions today</span><strong id="workoutTodayCount">0</strong></div>
+              <div class="sum"><span>Burned today</span><strong id="workoutBurnToday">0 kcal</strong></div>
+              <div class="sum"><span>Completed this week</span><strong id="workoutCompleteWeek">0</strong></div>
+              <div class="sum"><span>Latest split</span><strong id="workoutLatestSplit">-</strong></div>
+            </div>
+            <div id="workoutList" class="workout-list"></div>
+          </div>
+        </section>
+
+        <section id="calories-page" class="page">
+          <div class="calorie-shell">
+            <div class="panel">
+              <div class="head">
+                <div><h2>Calories Tracker</h2><p>Note your daily calories, keep a food log, and watch your calorie deficit clearly.</p></div>
+              </div>
+              <form id="calorieForm" novalidate>
+                <div class="grid2">
+                  <div class="field">
+                    <label for="calorieDate">Log date</label>
+                    <input id="calorieDate" type="date">
+                  </div>
+                  <div class="field">
+                    <label for="calorieItem">Food or meal</label>
+                    <input id="calorieItem" type="text" maxlength="120" placeholder="Breakfast oats, chicken rice, coffee...">
+                  </div>
+                </div>
+                <div class="grid2">
+                  <div class="field">
+                    <label for="calorieValue">Calories</label>
+                    <input id="calorieValue" type="number" min="0" max="5000" placeholder="450">
+                  </div>
+                  <div class="field">
+                    <label for="calorieNotes">Calories note</label>
+                    <input id="calorieNotes" type="text" maxlength="160" placeholder="Protein heavy, outside food, snack...">
+                  </div>
+                </div>
+                <div class="helper"><span id="calorieWarn" class="warn"></span><span>Net calories use food intake minus completed workout calories burned.</span></div>
+                <div class="form-actions">
+                  <button class="btn btn-primary" type="submit">Add calorie log</button>
+                  <button id="clearCalorieBtn" class="btn btn-soft" type="button">Clear</button>
+                </div>
+              </form>
+            </div>
+            <div class="calorie-insight">
+              <div class="sum"><span>Calories today</span><strong id="calorieTodayTotal">0 kcal</strong></div>
+              <div class="sum"><span>Burned today</span><strong id="burnedTodayTotal">0 kcal</strong></div>
+              <div class="sum"><span>Net calories</span><strong id="netTodayTotal">0 kcal</strong></div>
+              <div class="sum"><span>Deficit today</span><strong id="deficitTodayTotal">0 kcal</strong></div>
+            </div>
+            <div id="calorieList" class="calorie-list"></div>
+          </div>
+        </section>
+
+        <section id="health-page" class="page">
+          <div class="health-shell">
+            <div class="stack-grid">
+              <div class="panel">
+                <div class="head">
+                  <div><h2>Health & BMI</h2><p>Save your weight, height, maintenance calories, and daily deficit target for learning and job-focused productivity with better health habits.</p></div>
+                </div>
+                <form id="healthForm" novalidate>
+                  <div class="grid2">
+                    <div class="field">
+                      <label for="weightInput">Weight (kg)</label>
+                      <input id="weightInput" type="number" min="0" max="400" step="0.1" placeholder="72.5">
+                    </div>
+                    <div class="field">
+                      <label for="heightInput">Height (cm)</label>
+                      <input id="heightInput" type="number" min="0" max="250" step="0.1" placeholder="175">
+                    </div>
+                  </div>
+                  <div class="grid2">
+                    <div class="field">
+                      <label for="maintenanceInput">Maintenance calories</label>
+                      <input id="maintenanceInput" type="number" min="0" max="10000" placeholder="2400">
+                    </div>
+                    <div class="field">
+                      <label for="deficitInput">Target deficit (kcal)</label>
+                      <input id="deficitInput" type="number" min="0" max="3000" placeholder="500">
+                    </div>
+                  </div>
+                  <div class="helper"><span id="healthWarn" class="warn"></span><span>Your BMI and calorie target update from these values.</span></div>
+                  <div class="form-actions">
+                    <button class="btn btn-primary" type="submit">Save health profile</button>
+                    <button id="resetHealthBtn" class="btn btn-soft" type="button">Reset</button>
+                  </div>
+                </form>
+              </div>
+              <div class="health-hero">
+                <div class="panel">
+                  <div class="head">
+                    <div><h2>Body Metrics</h2><p>BMI, target calories, and current calorie status in one place.</p></div>
+                  </div>
+                  <div class="summary">
+                    <div class="sum"><span>BMI</span><strong id="bmiValue">-</strong></div>
+                    <div class="sum"><span>Category</span><strong id="bmiCategory">-</strong></div>
+                    <div class="sum"><span>Target calories</span><strong id="targetCaloriesValue">0 kcal</strong></div>
+                    <div class="sum"><span>Net today</span><strong id="netCaloriesValue">0 kcal</strong></div>
+                  </div>
+                </div>
+                <div class="health-highlights">
+                  <div class="health-note">
+                    <div class="health-value" id="actualDeficitValue">0 kcal</div>
+                    <div class="health-sub">Actual calorie deficit today</div>
+                    <div class="range-meter"><span id="deficitMeter" style="width:0%"></span></div>
+                    <p class="subtle">This uses maintenance calories minus your net calories for today.</p>
+                  </div>
+                  <div class="health-note">
+                    <div class="health-value" id="remainingTargetValue">0 kcal</div>
+                    <div class="health-sub">Distance from target calories</div>
+                    <p class="subtle" id="healthInsightText">Add your health values to start tracking BMI and your calorie deficit clearly.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="analytics-page" class="page">
+          <div class="analytics-shell">
+            <div class="analytics-header">
+              <h2>Statistics & Analytics</h2>
+              <p>Track your weekly progress and monthly completion trends in one clear section.</p>
+            </div>
+            <div class="summary">
+              <div class="sum"><span>Completed today</span><strong id="statToday">0</strong></div>
+              <div class="sum"><span>Completed this week</span><strong id="statWeek">0</strong></div>
+              <div class="sum"><span>Open tasks</span><strong id="statOpen">0</strong></div>
+              <div class="sum"><span>Completion rate</span><strong id="statRate">0%</strong></div>
+              <div class="sum"><span>Workouts this week</span><strong id="statWorkoutWeek">0</strong></div>
+              <div class="sum"><span>Deficit today</span><strong id="statDeficit">0 kcal</strong></div>
+            </div>
+            <div class="charts">
+              <article class="chart">
+                <div class="analytics-top">
+                  <div><h2>Weekly activity</h2><p>Completed tasks for the last 7 days.</p></div>
+                </div>
+                <canvas id="weekChart"></canvas>
+              </article>
+              <article class="chart">
+                <div><h2>Monthly summary</h2><p>Weekly completion totals for the current month.</p></div>
+                <canvas id="monthChart"></canvas>
+                <table>
+                  <thead><tr><th>Week</th><th>Completed</th></tr></thead>
+                  <tbody id="monthRows"></tbody>
+                </table>
+              </article>
+              <article class="chart">
+                <div><h2>Calories vs target</h2><p>Daily net calories compared with your target calories for the last 7 days.</p></div>
+                <canvas id="calorieChart"></canvas>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section id="motivate-page" class="page">
+          <article class="motivate panel">
+            <div class="head">
+              <div><h2>Motivate Me</h2><p>Hear a random motivational quote or a quick celebration when you complete a task.</p></div>
+            </div>
+            <div class="switch-row">
+              <button id="motivateBtn" class="btn btn-primary" type="button">Motivate me</button>
+              <label class="switch"><input id="voiceToggle" type="checkbox"> Speak on task completion</label>
+            </div>
+            <div class="field">
+              <label for="spokenText">Last spoken quote</label>
+              <textarea id="spokenText" class="spoken" readonly></textarea>
+            </div>
+          </article>
+        </section>
       </div>
-    </div>
+    </main>
+  </div>
 
-    <div class="flex items-center gap-1 ml-auto">
-      <button id="mobileSearchBtn" class="md:hidden p-2 rounded-lg hover:bg-white/10 text-slate-300">
-        <i class="fas fa-search"></i>
-      </button>
-      <button id="viewToggle" class="p-2 rounded-lg hover:bg-white/10 text-slate-300" title="Toggle view">
-        <i class="fas fa-th-large"></i>
-      </button>
-      <button id="themeToggle" class="p-2 rounded-lg hover:bg-white/10 text-slate-300" title="Toggle theme">
-        <i class="fas fa-moon"></i>
-      </button>
-      <button id="settingsBtn" class="p-2 rounded-lg hover:bg-white/10 text-slate-300" title="Settings">
-        <i class="fas fa-cog"></i>
-      </button>
+  <button id="fab" class="fab" type="button" aria-label="Create a note">+</button>
+
+  <div id="noteModalBack" class="modal-back" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="noteModalTitle">
+      <div class="modal-head">
+        <div><h2 id="noteModalTitle">Edit note</h2><p>Update the title, label, text, checklist, or pin state.</p></div>
+        <button id="noteClose" class="close" type="button" aria-label="Close note editor">&times;</button>
+      </div>
+      <form id="noteEditForm" novalidate>
+        <input id="editNoteId" type="hidden">
+        <div class="grid2">
+          <div class="field"><label for="editNoteTitle">Note title</label><input id="editNoteTitle" type="text" maxlength="120" required></div>
+          <div class="field"><label for="editNoteLabel">Note label</label><input id="editNoteLabel" type="text" maxlength="40"></div>
+        </div>
+        <div class="field"><label for="editNoteBody">Content</label><textarea id="editNoteBody" maxlength="5000"></textarea></div>
+        <div id="editChecklistPanel" class="checklist-panel show">
+          <div class="mini-tools">
+            <span class="tool-chip">Checklist items</span>
+          </div>
+          <div class="checklist-add">
+            <input id="editChecklistInput" type="text" maxlength="120" placeholder="Add checklist item">
+            <button id="addEditChecklistItemBtn" class="btn btn-soft" type="button">Add item</button>
+          </div>
+          <div id="editChecklistList" class="checklist-list"></div>
+        </div>
+        <div class="toolbar">
+          <div class="left">
+            <label class="switch"><input id="editNotePinned" type="checkbox"> Pinned</label>
+          </div>
+        </div>
+        <div class="note-actionbar" aria-label="Note actions">
+          <div class="note-action-left">
+            <button id="editLabelFocusBtn" class="action-icon" type="button" aria-label="Add label">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M5 7h14M5 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+            <button id="editChecklistToggleBtn" class="action-icon active" type="button" aria-label="Show or hide checkboxes">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M9 7h10M9 12h10M9 17h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="m4 7 1.5 1.5L7.8 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button id="editPinToggleBtn" class="action-icon" type="button" aria-label="Toggle pin">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M8 4h8l-2 5v4l3 2v1H7v-1l3-2V9L8 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="menu-wrap">
+              <button id="editMoreBtn" class="action-icon" type="button" aria-label="More note options">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="19" r="1.8" fill="currentColor"/></svg>
+              </button>
+              <div id="editActionMenu" class="note-menu action-menu">
+                <button id="editMenuLabelBtn" type="button">Add label</button>
+                <button id="editMenuChecklistBtn" type="button">Hide checkboxes</button>
+                <button id="editMenuDuplicateBtn" type="button">Make a copy</button>
+                <button id="editMenuInfoBtn" type="button">Version info</button>
+              </div>
+            </div>
+          </div>
+          <div class="note-action-right">
+            <button id="noteActionClose" class="action-close" type="button">Close</button>
+          </div>
+        </div>
+        <div class="helper"><span id="editNoteWarn" class="warn"></span><span id="editNoteMeta">0 / 5000 characters</span></div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Save note</button>
+          <button id="noteCancel" class="btn btn-soft" type="button">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
-</header>
 
-<div class="flex">
-
-  <!-- ═══ SIDEBAR ═══ -->
-  <aside id="sidebar" class="w-60 glass shrink-0 min-h-screen py-5 px-3 overflow-y-auto hidden md:block">
-    <nav class="space-y-0.5">
-      <p class="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-widest">Navigation</p>
-      <a href="#" class="sidebar-item active" data-filter="all">
-        <i class="fas fa-file-alt w-4"></i><span>All Notes</span>
-      </a>
-      <a href="#" class="sidebar-item" data-filter="reminders">
-        <i class="fas fa-clock w-4"></i><span>Reminders</span>
-      </a>
-      <a href="#" class="sidebar-item" data-filter="labels">
-        <i class="fas fa-bookmark w-4"></i><span>Labels</span>
-      </a>
-      <a href="#" class="sidebar-item" data-filter="archive">
-        <i class="fas fa-box w-4"></i><span>Archive</span>
-      </a>
-      <a href="#" class="sidebar-item" data-filter="trash">
-        <i class="fas fa-trash-alt w-4"></i><span>Trash</span>
-      </a>
-    </nav>
-
-    <!-- Labels -->
-    <div class="mt-6">
-      <p class="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-widest">Labels</p>
-      <div id="labelsList" class="space-y-0.5"></div>
-      <button id="addLabelBtn"
-        class="mt-2 px-3 py-2 text-xs text-sky-400 hover:text-sky-300 flex items-center gap-2 transition-colors">
-        <i class="fas fa-plus"></i> Add Label
-      </button>
-      <button id="clearLabelsBtn"
-        class="px-3 py-1 text-xs text-red-400 hover:text-red-300 flex items-center gap-2 transition-colors">
-        <i class="fas fa-times"></i> Clear All
-      </button>
-    </div>
-
-    <!-- ── Quick stats (FIX: missing elements added) ── -->
-    <div class="mt-6 mx-2 glass rounded-xl p-3">
-      <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">Quick Stats</p>
-      <div class="grid grid-cols-3 gap-1">
-        <div class="quick-stat">
-          <div class="val" id="totalNotesCount">0</div>
-          <div class="lbl">Notes</div>
+  <div id="todoModalBack" class="modal-back" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="todoModalTitle">
+      <div class="modal-head">
+        <div><h2 id="todoModalTitle">Edit task</h2><p>Adjust your task description or due date.</p></div>
+        <button id="todoClose" class="close" type="button" aria-label="Close task editor">&times;</button>
+      </div>
+      <form id="todoEditForm" novalidate>
+        <input id="editTodoId" type="hidden">
+        <div class="field"><label for="editTodoText">Task description</label><input id="editTodoText" type="text" maxlength="180" required></div>
+        <div class="field"><label for="editTodoDate">Due date</label><input id="editTodoDate" type="date"></div>
+        <div class="helper"><span id="editTodoWarn" class="warn"></span><span>Completed status remains unchanged.</span></div>
+        <div class="form-actions">
+          <button class="btn btn-primary" type="submit">Save task</button>
+          <button id="todoCancel" class="btn btn-soft" type="button">Cancel</button>
         </div>
-        <div class="quick-stat">
-          <div class="val" id="tasksCountToday">0</div>
-          <div class="lbl">Today</div>
-        </div>
-        <div class="quick-stat">
-          <div class="val" id="completedTodayCount">0</div>
-          <div class="lbl">Done</div>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ═══ MAIN ═══ -->
-  <main class="flex-1 p-4 md:p-6 min-w-0">
-
-    <!-- Tab nav -->
-    <div class="flex items-center gap-1 mb-6 pb-4 border-b border-white/8 overflow-x-auto">
-      <button class="tab-btn active" data-tab="notes">
-        <i class="fas fa-sticky-note mr-1.5"></i><span class="tab-text">Notes</span>
-      </button>
-      <button class="tab-btn" data-tab="tasks">
-        <i class="fas fa-list-check mr-1.5"></i><span class="tab-text">Tasks</span>
-      </button>
-      <button class="tab-btn" data-tab="stats">
-        <i class="fas fa-chart-line mr-1.5"></i><span class="tab-text">Stats</span>
-      </button>
-      <button class="tab-btn" data-tab="trash">
-        <i class="fas fa-trash-alt mr-1.5"></i><span class="tab-text">Trash</span>
-      </button>
-    </div>
-
-    <!-- ── NOTES TAB ── -->
-    <div id="notesTab" class="tab-content">
-      <div class="glass rounded-xl p-4 mb-6 max-w-3xl mx-auto">
-        <div class="flex items-center gap-3">
-          <input id="quickTitle" type="text" placeholder="Create a new note…"
-            class="flex-1 bg-transparent border-none outline-none text-sm placeholder-slate-400">
-          <button id="quickAddBtn"
-            class="bg-sky-500 hover:bg-sky-400 text-white px-5 py-2 rounded-lg text-sm font-semibold">
-            Add
-          </button>
-        </div>
-      </div>
-
-      <div id="notesContainer" class="masonry-grid"></div>
-
-      <div id="emptyState" class="text-center py-16 hidden">
-        <i class="fas fa-sticky-note text-5xl text-slate-600 mb-4 block"></i>
-        <p class="text-slate-400 font-medium">No notes yet. Create one above!</p>
-      </div>
-    </div>
-
-    <!-- ── TASKS TAB ── -->
-    <div id="tasksTab" class="tab-content hidden">
-      <div class="glass rounded-xl p-4 mb-5">
-        <div class="flex items-center gap-3">
-          <input id="taskInput" type="text" placeholder="Add a new task…"
-            class="flex-1 bg-transparent border-none outline-none text-sm placeholder-slate-400">
-          <button id="addTaskBtn"
-            class="bg-sky-500 hover:bg-sky-400 text-white px-5 py-2 rounded-lg text-sm font-semibold">
-            Add
-          </button>
-        </div>
-      </div>
-      <div id="tasksContainer" class="space-y-3"></div>
-      <div id="emptyTasksState" class="text-center py-16">
-        <i class="fas fa-tasks text-5xl text-slate-600 mb-4 block"></i>
-        <p class="text-slate-400 font-medium">No tasks yet. Add one above!</p>
-      </div>
-    </div>
-
-    <!-- ── STATS TAB ── -->
-    <div id="statsTab" class="tab-content hidden">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
-        <div class="stat-card glass rounded-xl p-5">
-          <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">Total Notes</p>
-          <p class="text-4xl font-bold text-sky-400" id="statTotalNotes">0</p>
-          <p class="text-xs text-slate-500 mt-1">All time</p>
-        </div>
-        <div class="stat-card glass rounded-xl p-5">
-          <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">Tasks Completed</p>
-          <p class="text-4xl font-bold text-emerald-400" id="statTasksCompleted">0</p>
-          <p class="text-xs text-slate-500 mt-1">All time</p>
-        </div>
-        <div class="stat-card glass rounded-xl p-5">
-          <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">Completion Rate</p>
-          <p class="text-4xl font-bold text-violet-400" id="statCompletionRate">0%</p>
-          <p class="text-xs text-slate-500 mt-1">All tasks</p>
-        </div>
-      </div>
-      <div class="glass rounded-xl p-5 mb-5">
-        <h3 class="font-bold mb-4 text-slate-200">Monthly Notes Created</h3>
-        <canvas id="monthlyChart" height="80"></canvas>
-      </div>
-      <div class="glass rounded-xl p-5">
-        <h3 class="font-bold mb-4 text-slate-200">Yearly Task Heatmap</h3>
-        <div class="grid grid-cols-4 md:grid-cols-12 gap-2" id="yearlyHeatmap"></div>
-      </div>
-    </div>
-
-    <!-- ── TRASH TAB ── -->
-    <div id="trashTab" class="tab-content hidden">
-      <div class="flex gap-3 mb-5">
-        <button id="emptyTrashBtn"
-          class="bg-red-600 hover:bg-red-500 text-white px-5 py-2 rounded-lg text-sm font-semibold">
-          <i class="fas fa-trash mr-2"></i>Empty Trash
-        </button>
-        <button id="restoreAllBtn"
-          class="bg-sky-600 hover:bg-sky-500 text-white px-5 py-2 rounded-lg text-sm font-semibold">
-          <i class="fas fa-undo mr-2"></i>Restore All
-        </button>
-      </div>
-      <div id="trashContainer" class="space-y-3"></div>
-      <div id="emptyTrashState" class="text-center py-16">
-        <i class="fas fa-trash-can text-5xl text-slate-600 mb-4 block"></i>
-        <p class="text-slate-400 font-medium">Trash is empty</p>
-      </div>
-    </div>
-
-  </main>
-</div>
-
-<!-- ═══ NOTE EDIT MODAL ═══ -->
-<div id="noteModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
-  <div class="glass rounded-2xl w-full max-w-xl mx-4 modal-enter">
-    <div class="p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-slate-100">Edit Note</h2>
-        <button id="closeModal" class="text-slate-400 hover:text-slate-200 transition-colors">
-          <i class="fas fa-times text-xl"></i>
-        </button>
-      </div>
-      <input id="modalTitle" type="text" placeholder="Note title…"
-        class="w-full text-xl font-bold bg-transparent border-none outline-none mb-3 text-slate-100 placeholder-slate-500">
-      <textarea id="modalContent" placeholder="Note content…"
-        class="w-full h-48 bg-transparent border-none outline-none resize-none text-slate-200 placeholder-slate-500 text-sm"></textarea>
-      <input id="modalLabels" type="text" placeholder="Labels (comma-separated)"
-        class="w-full mt-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm
-               text-slate-200 placeholder-slate-500 outline-none focus:ring-1 focus:ring-sky-400">
-
-      <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/8">
-        <div class="flex gap-2">
-          <button class="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-sky-400 transition-colors" title="Add checklist item" id="modalChecklistBtn">
-            <i class="fas fa-list-check"></i>
-          </button>
-          <button class="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-sky-400 transition-colors" title="Set reminder" id="modalReminderBtn">
-            <i class="fas fa-bell"></i>
-          </button>
-          <button class="p-2 rounded-lg hover:bg-white/10 text-slate-400 hover:text-sky-400 transition-colors" title="Change color" id="modalColorBtn">
-            <i class="fas fa-palette"></i>
-          </button>
-        </div>
-        <button id="saveNote"
-          class="bg-sky-500 hover:bg-sky-400 text-white px-6 py-2 rounded-lg text-sm font-semibold">
-          Save
-        </button>
-      </div>
+      </form>
     </div>
   </div>
-</div>
 
-<!-- ═══ SETTINGS MODAL ═══ -->
-<div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-sm">
-  <div class="glass rounded-2xl w-full max-w-md mx-4 p-6 modal-enter">
-    <div class="flex items-center justify-between mb-5">
-      <h2 class="text-xl font-bold text-slate-100">Settings</h2>
-      <button id="closeSettings" class="text-slate-400 hover:text-slate-200 transition-colors">
-        <i class="fas fa-times text-xl"></i>
-      </button>
-    </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script>
+    (() => {
+      const K_NOTES="aswin_notes",K_TODOS="aswin_todos",K_WORKOUTS="aswin_workouts",K_CALORIES="aswin_calories",K_HEALTH="aswin_health_profile",K_THEME="aswin_keep_theme",K_VOICE="aswin_voice_completion",K_BOARD="aswin_board_name";
+      const qs=(s)=>document.querySelector(s),qsa=(s)=>[...document.querySelectorAll(s)];
+      const navButtons=qsa(".nav-btn"),pages=qsa(".page"),todoTabs=qsa(".todo-tab"),overviewLinks=qsa(".overview-link");
+      const globalSearch=qs("#globalSearch"),themeBtn=qs("#themeBtn"),fab=qs("#fab");
+      const ambientCanvas=qs("#ambientCanvas");
+      const clockTime=qs("#clockTime"),clockDate=qs("#clockDate"),clockDay=qs("#clockDay"),clockMonth=qs("#clockMonth"),clockDateNum=qs("#clockDateNum"),clockYear=qs("#clockYear");
+      const noteComposer=qs("#noteComposer"),quickNoteTitle=qs("#quickNoteTitle"),quickNoteLabel=qs("#quickNoteLabel"),quickNoteBody=qs("#quickNoteBody");
+      const checklistToggleBtn=qs("#checklistToggleBtn"),checklistPanel=qs("#checklistPanel"),quickChecklistInput=qs("#quickChecklistInput"),addChecklistItemBtn=qs("#addChecklistItemBtn"),quickChecklistList=qs("#quickChecklistList");
+      const notesBoardName=qs("#notesBoardName"),noteWarn=qs("#noteWarn"),noteMeta=qs("#noteMeta"),saveNoteBtn=qs("#saveNoteBtn"),clearComposerBtn=qs("#clearComposerBtn");
+      const pinToggleBtn=qs("#pinToggleBtn");
+      const pinnedNotes=qs("#pinnedNotes"),otherNotes=qs("#otherNotes"),notesHeading=qs("#notesHeading");
+      const todoForm=qs("#todoForm"),todoText=qs("#todoText"),todoDate=qs("#todoDate"),todoWarn=qs("#todoWarn"),clearTodoBtn=qs("#clearTodoBtn"),todoList=qs("#todoList");
+      const workoutForm=qs("#workoutForm"),workoutDate=qs("#workoutDate"),workoutSplit=qs("#workoutSplit"),workoutName=qs("#workoutName"),workoutDuration=qs("#workoutDuration"),workoutBurn=qs("#workoutBurn"),workoutNotes=qs("#workoutNotes"),workoutCompleted=qs("#workoutCompleted"),workoutWarn=qs("#workoutWarn"),clearWorkoutBtn=qs("#clearWorkoutBtn"),workoutList=qs("#workoutList");
+      const calorieForm=qs("#calorieForm"),calorieDate=qs("#calorieDate"),calorieItem=qs("#calorieItem"),calorieValue=qs("#calorieValue"),calorieNotes=qs("#calorieNotes"),calorieWarn=qs("#calorieWarn"),clearCalorieBtn=qs("#clearCalorieBtn"),calorieList=qs("#calorieList");
+      const healthForm=qs("#healthForm"),weightInput=qs("#weightInput"),heightInput=qs("#heightInput"),maintenanceInput=qs("#maintenanceInput"),deficitInput=qs("#deficitInput"),healthWarn=qs("#healthWarn"),resetHealthBtn=qs("#resetHealthBtn");
+      const noteModalBack=qs("#noteModalBack"),todoModalBack=qs("#todoModalBack"),noteEditForm=qs("#noteEditForm"),todoEditForm=qs("#todoEditForm");
+      const editNoteId=qs("#editNoteId"),editNoteTitle=qs("#editNoteTitle"),editNoteLabel=qs("#editNoteLabel"),editNoteBody=qs("#editNoteBody"),editNotePinned=qs("#editNotePinned"),editNoteWarn=qs("#editNoteWarn"),editNoteMeta=qs("#editNoteMeta");
+      const editChecklistPanel=qs("#editChecklistPanel"),editChecklistInput=qs("#editChecklistInput"),addEditChecklistItemBtn=qs("#addEditChecklistItemBtn"),editChecklistList=qs("#editChecklistList"),editChecklistToggleBtn=qs("#editChecklistToggleBtn"),editPinToggleBtn=qs("#editPinToggleBtn"),editLabelFocusBtn=qs("#editLabelFocusBtn"),editMoreBtn=qs("#editMoreBtn"),editActionMenu=qs("#editActionMenu"),editMenuLabelBtn=qs("#editMenuLabelBtn"),editMenuChecklistBtn=qs("#editMenuChecklistBtn"),editMenuDuplicateBtn=qs("#editMenuDuplicateBtn"),editMenuInfoBtn=qs("#editMenuInfoBtn"),noteActionClose=qs("#noteActionClose");
+      const editTodoId=qs("#editTodoId"),editTodoText=qs("#editTodoText"),editTodoDate=qs("#editTodoDate"),editTodoWarn=qs("#editTodoWarn");
+      const noteClose=qs("#noteClose"),noteCancel=qs("#noteCancel"),todoClose=qs("#todoClose"),todoCancel=qs("#todoCancel");
+      const motivateBtn=qs("#motivateBtn"),voiceToggle=qs("#voiceToggle"),spokenText=qs("#spokenText");
+      const noteCount=qs("#noteCount"),taskCount=qs("#taskCount"),doneCount=qs("#doneCount"),todayCount=qs("#todayCount"),workoutWeekCount=qs("#workoutWeekCount"),deficitTodayStat=qs("#deficitTodayStat"),healthTargetCalories=qs("#healthTargetCalories"),healthCaloriesToday=qs("#healthCaloriesToday"),healthNetToday=qs("#healthNetToday"),bmiOverview=qs("#bmiOverview");
+      const workoutTodayCount=qs("#workoutTodayCount"),workoutBurnToday=qs("#workoutBurnToday"),workoutCompleteWeek=qs("#workoutCompleteWeek"),workoutLatestSplit=qs("#workoutLatestSplit");
+      const calorieTodayTotal=qs("#calorieTodayTotal"),burnedTodayTotal=qs("#burnedTodayTotal"),netTodayTotal=qs("#netTodayTotal"),deficitTodayTotal=qs("#deficitTodayTotal");
+      const bmiValue=qs("#bmiValue"),bmiCategory=qs("#bmiCategory"),targetCaloriesValue=qs("#targetCaloriesValue"),netCaloriesValue=qs("#netCaloriesValue"),actualDeficitValue=qs("#actualDeficitValue"),remainingTargetValue=qs("#remainingTargetValue"),deficitMeter=qs("#deficitMeter"),healthInsightText=qs("#healthInsightText");
+      const statToday=qs("#statToday"),statWeek=qs("#statWeek"),statOpen=qs("#statOpen"),statRate=qs("#statRate"),statWorkoutWeek=qs("#statWorkoutWeek"),statDeficit=qs("#statDeficit"),monthRows=qs("#monthRows");
+      const weekChartCanvas=qs("#weekChart"),monthChartCanvas=qs("#monthChart"),calorieChartCanvas=qs("#calorieChart");
+      const quotes=["Small progress still changes the story. Keep going.","Consistency is your quiet superpower. Use it today.","Finish one meaningful thing and the rest of the day feels lighter.","Momentum grows when you act before you overthink.","You are building trust with yourself one completed task at a time.","A calm plan and one focused step can shift everything."];
+      const cheers=["Nice work. Another task is complete.","Excellent. Your progress is real.","Well done. Keep that momentum alive.","Great job. One more win on the board."];
+      const defaultHealth={weightKg:"",heightCm:"",maintenanceCalories:"",targetDeficit:"500"};
+      let notes=load(K_NOTES),todos=load(K_TODOS),workouts=load(K_WORKOUTS),calorieLogs=load(K_CALORIES),health=loadObject(K_HEALTH,defaultHealth),noteFilter="",todoView="all",composerPinned=false,composerChecklist=[],editChecklist=[],lastFocus=null,weekChart=null,monthChart=null,calorieChart=null;
+      let ambientCleanup=()=>{};
+      let clockTimer=0;
 
-    <!-- Theme mode -->
-    <div class="mb-5">
-      <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Theme Mode</label>
-      <select id="themeMode"
-        class="w-full py-2 px-3 bg-white/5 border border-white/10 rounded-lg text-sm text-slate-200 outline-none
-               focus:ring-1 focus:ring-sky-400">
-        <option value="default">Default (Dark Space)</option>
-        <option value="neon">Neon Green</option>
-        <option value="pink">Pink Dream</option>
-        <option value="forest">Forest</option>
-        <option value="twilight">Twilight Purple</option>
-        <option value="ocean">Deep Ocean</option>
-        <option value="ember">Ember</option>
-      </select>
-    </div>
+      initTheme();
+      ambientCleanup=initAmbientBackground();
+      startClock();
+      voiceToggle.checked=localStorage.getItem(K_VOICE)!=="false";
+      notesBoardName.value=localStorage.getItem(K_BOARD)||"Aswin Notes";
+      workoutDate.value=today();
+      calorieDate.value=today();
+      weightInput.value=health.weightKg||"";
+      heightInput.value=health.heightCm||"";
+      maintenanceInput.value=health.maintenanceCalories||"";
+      deficitInput.value=health.targetDeficit||"500";
+      applyBoardName();
+      renderAll();
+      updateComposerMeta();
 
-    <!-- Sidebar toggles -->
-    <div class="space-y-3 text-sm mb-5">
-      <label class="flex items-center justify-between text-slate-300">
-        <span>Show Animated Background</span>
-        <input type="checkbox" id="settingBgAnim" checked class="accent-sky-400">
-      </label>
-    </div>
-
-    <!-- Export / Import (FIX: were referenced in JS but missing from HTML) -->
-    <div class="flex gap-3 pt-4 border-t border-white/8">
-      <button id="exportBtn"
-        class="flex-1 py-2 rounded-lg text-sm font-semibold bg-emerald-600/80 hover:bg-emerald-500 text-white transition-colors">
-        <i class="fas fa-file-export mr-2"></i>Export Notes
-      </button>
-      <button id="importBtn"
-        class="flex-1 py-2 rounded-lg text-sm font-semibold bg-violet-600/80 hover:bg-violet-500 text-white transition-colors">
-        <i class="fas fa-file-import mr-2"></i>Import Notes
-      </button>
-    </div>
-
-    <div class="flex justify-end mt-4">
-      <button id="saveSettings"
-        class="bg-sky-500 hover:bg-sky-400 text-white px-6 py-2 rounded-lg text-sm font-semibold">
-        Save
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ TOAST ═══ -->
-<div id="toast" class="fixed bottom-5 right-5 z-50 glass rounded-xl px-4 py-3 shadow-xl hidden fade-in">
-  <div class="flex items-center gap-3">
-    <i id="toastIcon" class="fas fa-info-circle text-sky-400"></i>
-    <span id="toastMsg" class="text-sm text-slate-200">Message</span>
-    <button id="undoDelete" class="ml-2 text-sky-400 text-sm font-semibold hover:text-sky-300 hidden">Undo</button>
-    <button id="closeToast" class="ml-1 text-slate-400 hover:text-slate-200"><i class="fas fa-times text-xs"></i></button>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════ -->
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-
-  /* ═══════════════════════════════════════════════
-     AMAZING MULTI-LAYER CANVAS BACKGROUND
-  ═══════════════════════════════════════════════ */
-  const canvas = document.getElementById('bgCanvas');
-  const ctx = canvas.getContext('2d');
-  let W, H;
-  let mouse = { x: -9999, y: -9999 };
-  let animBg = true;
-
-  document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
-  document.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
-
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', () => { resize(); initParticles(); buildStars(); });
-  resize();
-
-  /* ── Star field ── */
-  let stars = [];
-  function buildStars() {
-    stars = Array.from({ length: 320 }, () => ({
-      x:  Math.random() * W,
-      y:  Math.random() * H,
-      r:  Math.random() * 1.3 + 0.25,
-      drift: Math.random() * 0.12 + 0.02,
-      phase: Math.random() * Math.PI * 2,
-      twSpd: Math.random() * 0.025 + 0.008,
-      col: ['255,255,255','210,235,255','255,245,210','180,255,245','220,200,255'][Math.floor(Math.random()*5)]
-    }));
-  }
-  buildStars();
-
-  /* ── Shooting stars ── */
-  let shooters = [];
-  function spawnShooter() {
-    if (!animBg) return;
-    const ang = (10 + Math.random() * 35) * Math.PI / 180;
-    shooters.push({
-      x: Math.random() * W * 0.75,
-      y: Math.random() * H * 0.35,
-      vx: Math.cos(ang) * (10 + Math.random() * 8),
-      vy: Math.sin(ang) * (10 + Math.random() * 8),
-      life: 1,
-      decay: Math.random() * 0.018 + 0.01,
-      tail: Math.random() * 90 + 60
-    });
-  }
-  function scheduleShooter() {
-    spawnShooter();
-    setTimeout(scheduleShooter, 3500 + Math.random() * 5000);
-  }
-  scheduleShooter();
-
-  /* ── Constellation particles ── */
-  let pts = [];
-  function initParticles() {
-    pts = Array.from({ length: 70 }, () => ({
-      x:  Math.random() * W,
-      y:  Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.45,
-      vy: (Math.random() - 0.5) * 0.45,
-      r:  Math.random() * 1.6 + 0.7,
-      col: ['56,189,248','16,185,129','139,92,246','251,191,36','251,113,133'][Math.floor(Math.random()*5)]
-    }));
-  }
-  initParticles();
-
-  /* ── Glowing orbs ── */
-  const ORBS = [
-    { col:'56,189,248',  r: 90,  spd: 0.28 },
-    { col:'139,92,246',  r: 110, spd: 0.22 },
-    { col:'16,185,129',  r: 75,  spd: 0.35 },
-    { col:'251,113,133', r: 65,  spd: 0.4  },
-  ];
-  const orbs = ORBS.map(o => ({
-    ...o,
-    x: Math.random() * W, y: Math.random() * H,
-    vx: (Math.random() - 0.5) * o.spd,
-    vy: (Math.random() - 0.5) * o.spd,
-    phase: Math.random() * Math.PI * 2
-  }));
-
-  /* ── Aurora config ── */
-  const auroraWaves = [
-    { col: '56,189,248',  baseY: 0.18, amp: 45, freq: 0.005,  spd: 0.28, opacity: 0.13 },
-    { col: '16,185,129',  baseY: 0.13, amp: 38, freq: 0.008,  spd: 0.45, opacity: 0.10 },
-    { col: '139,92,246',  baseY: 0.09, amp: 32, freq: 0.006,  spd: 0.38, opacity: 0.09 },
-    { col: '251,113,133', baseY: 0.06, amp: 24, freq: 0.009,  spd: 0.55, opacity: 0.07 },
-  ];
-
-  /* ── Nebula blobs ── */
-  const nebulas = [
-    { col:'56,189,248',  rx:0.15, ry:0.25, r:W*0.22 },
-    { col:'139,92,246',  rx:0.75, ry:0.15, r:W*0.18 },
-    { col:'16,185,129',  rx:0.85, ry:0.7,  r:W*0.16 },
-    { col:'251,113,133', rx:0.2,  ry:0.8,  r:W*0.14 },
-  ];
-
-  let T = 0;
-
-  function drawFrame() {
-    if (!animBg) {
-      // Static dark bg
-      ctx.fillStyle = '#07111e';
-      ctx.fillRect(0, 0, W, H);
-      requestAnimationFrame(drawFrame);
-      return;
-    }
-
-    ctx.clearRect(0, 0, W, H);
-
-    /* 1 ── Deep space base gradient */
-    const bgGrad = ctx.createRadialGradient(W*0.5, H*0.4, 0, W*0.5, H*0.5, Math.max(W,H)*0.8);
-    bgGrad.addColorStop(0,   '#0d1f35');
-    bgGrad.addColorStop(0.45,'#091222');
-    bgGrad.addColorStop(1,   '#040810');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, W, H);
-
-    /* 2 ── Nebula blobs (very soft) */
-    nebulas.forEach(n => {
-      const g = ctx.createRadialGradient(n.rx*W, n.ry*H, 0, n.rx*W, n.ry*H, n.r);
-      g.addColorStop(0,   `rgba(${n.col},0.055)`);
-      g.addColorStop(0.5, `rgba(${n.col},0.025)`);
-      g.addColorStop(1,   `rgba(${n.col},0)`);
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
-    });
-
-    /* 3 ── Aurora waves */
-    auroraWaves.forEach(w => {
-      ctx.beginPath();
-      ctx.moveTo(0, H * w.baseY);
-      for (let x = 0; x <= W; x += 5) {
-        const y = H * w.baseY
-          + Math.sin(x * w.freq + T * w.spd) * w.amp
-          + Math.sin(x * w.freq * 2.5 + T * w.spd * 1.8) * w.amp * 0.35;
-        ctx.lineTo(x, y);
+      function load(key){try{const v=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(v)?v:[]}catch{return[]}}
+      function save(key,val){localStorage.setItem(key,JSON.stringify(val))}
+      function loadObject(key,fallback){try{const raw=JSON.parse(localStorage.getItem(key)||"null");return raw&&typeof raw==="object"&&!Array.isArray(raw)?{...fallback,...raw}:{...fallback}}catch{return{...fallback}}}
+      function id(prefix){return prefix+"-"+(crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(16).slice(2))}
+      function clean(v){return String(v||"").trim()}
+      function lower(v){return clean(v).toLowerCase()}
+      function num(v){const n=Number(v);return Number.isFinite(n)?n:0}
+      function fmtDate(iso){if(!iso)return"No due date";return new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric",year:"numeric"}).format(new Date(iso+"T00:00:00"))}
+      function fmtTime(ms){return new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}).format(new Date(ms))}
+      function today(){return new Date().toLocaleDateString("en-CA")}
+      function kcal(value){return `${Math.round(num(value))} kcal`}
+      function shorten(text,n){const t=String(text||"").replace(/\s+/g," ").trim();return !t?"No extra details yet.":(t.length>n?t.slice(0,n).trimEnd()+"...":t)}
+      function sameDay(a,b){if(!a||!b)return false;a=new Date(a);b=new Date(b);return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate()}
+      function say(text){spokenText.value=text;if(!("speechSynthesis"in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=1;window.speechSynthesis.speak(u)}
+      function pick(list){return list[Math.floor(Math.random()*list.length)]}
+      function warn(el,msg){el.textContent=msg}
+      function weekStartDate(){const start=new Date();start.setHours(0,0,0,0);start.setDate(start.getDate()-((start.getDay()+6)%7));return start}
+      function isThisWeek(dateLike){const start=weekStartDate().getTime();const date=new Date(dateLike+"T00:00:00").getTime();return date>=start}
+      function intakeForDate(date){return calorieLogs.filter((entry)=>entry.date===date).reduce((sum,entry)=>sum+num(entry.calories),0)}
+      function burnForDate(date){return workouts.filter((session)=>session.date===date&&session.completed).reduce((sum,session)=>sum+num(session.caloriesBurned),0)}
+      function netForDate(date){return intakeForDate(date)-burnForDate(date)}
+      function targetCalories(){const maintenance=num(health.maintenanceCalories),targetDeficit=num(health.targetDeficit);return Math.max(0,maintenance-targetDeficit)}
+      function actualDeficitForDate(date){const maintenance=num(health.maintenanceCalories);return maintenance?maintenance-netForDate(date):0}
+      function bmiNumber(){const weight=num(health.weightKg),heightCm=num(health.heightCm);if(!weight||!heightCm)return 0;const heightM=heightCm/100;return weight/(heightM*heightM)}
+      function bmiText(value){if(!value)return"Not set";if(value<18.5)return"Underweight";if(value<25)return"Healthy";if(value<30)return"Overweight";return"Obese"}
+      function normalizeChecklist(list){
+        return Array.isArray(list)
+          ? list
+              .map((item)=>({
+                id:item&&item.id?String(item.id):id("check"),
+                text:clean(item&&item.text),
+                checked:!!(item&&item.checked)
+              }))
+              .filter((item)=>item.text)
+          : [];
       }
-      ctx.lineTo(W, 0); ctx.lineTo(0, 0); ctx.closePath();
-      const ag = ctx.createLinearGradient(0, 0, 0, H * w.baseY + w.amp * 2);
-      ag.addColorStop(0,   `rgba(${w.col},${w.opacity})`);
-      ag.addColorStop(0.55,`rgba(${w.col},${w.opacity * 0.45})`);
-      ag.addColorStop(1,   `rgba(${w.col},0)`);
-      ctx.fillStyle = ag;
-      ctx.fill();
-    });
+      function renderChecklist(target,list,onToggle,onRemove){
+        if(!target)return;
+        target.innerHTML="";
+        if(!list.length)return;
+        list.forEach((item)=>{
+          const row=document.createElement("div");
+          row.className="check-item"+(item.checked?" done":"");
+          row.innerHTML=`<input type="checkbox" aria-label="Toggle checklist item"><span></span><button type="button" aria-label="Remove checklist item">&times;</button>`;
+          const checkbox=row.querySelector("input");
+          const text=row.querySelector("span");
+          const remove=row.querySelector("button");
+          checkbox.checked=!!item.checked;
+          text.textContent=item.text;
+          checkbox.onchange=()=>onToggle(item.id,checkbox.checked);
+          remove.onclick=()=>onRemove(item.id);
+          target.appendChild(row);
+        });
+      }
+      function refreshComposerChecklist(){
+        renderChecklist(
+          quickChecklistList,
+          composerChecklist,
+          (itemId,checked)=>{
+            composerChecklist=composerChecklist.map((item)=>item.id===itemId?{...item,checked}:item);
+            refreshComposerChecklist();
+          },
+          (itemId)=>{
+            composerChecklist=composerChecklist.filter((item)=>item.id!==itemId);
+            refreshComposerChecklist();
+          }
+        );
+        checklistToggleBtn.classList.toggle("active",checklistPanel.classList.contains("show"));
+      }
+      function refreshEditChecklist(){
+        renderChecklist(
+          editChecklistList,
+          editChecklist,
+          (itemId,checked)=>{
+            editChecklist=editChecklist.map((item)=>item.id===itemId?{...item,checked}:item);
+            refreshEditChecklist();
+          },
+          (itemId)=>{
+            editChecklist=editChecklist.filter((item)=>item.id!==itemId);
+            refreshEditChecklist();
+          }
+        );
+      }
+      function setChecklistVisibility(show){
+        editChecklistPanel.classList.toggle("show",show);
+        editChecklistToggleBtn.classList.toggle("active",show);
+        editMenuChecklistBtn.textContent=show?"Hide checkboxes":"Show checkboxes";
+      }
+      function setPinnedButtonState(){
+        editPinToggleBtn.classList.toggle("active",!!editNotePinned.checked);
+      }
+      function openModal(back,focusEl){back.classList.add("open");back.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";setTimeout(()=>focusEl.focus(),40)}
+      function closeModal(back){back.classList.remove("open");back.setAttribute("aria-hidden","true");document.body.style.overflow="";if(editActionMenu)editActionMenu.classList.remove("show");if(lastFocus&&lastFocus.focus)lastFocus.focus()}
+      function initTheme(){const saved=localStorage.getItem(K_THEME);const dark=saved===null?true:saved==="dark";document.body.dataset.theme=dark?"dark":"light";themeBtn.textContent=dark?"Light theme":"Dark theme"}
+      function applyBoardName(){const name=clean(notesBoardName.value)||"Aswin Notes";notesHeading.textContent=name;localStorage.setItem(K_BOARD,name)}
+      function setComposerChecklistVisibility(show){
+        checklistPanel.classList.toggle("show",show);
+        checklistToggleBtn.classList.toggle("active",show);
+      }
+      function updateComposerMeta(){noteMeta.textContent=quickNoteBody.value.length+" / 5000 characters";editNoteMeta.textContent=editNoteBody.value.length+" / 5000 characters";pinToggleBtn.style.background=composerPinned?"#fff4c1":"#fff"}
+      function filteredNotes(){const list=[...notes].sort((a,b)=>Number(b.pinned)-Number(a.pinned)||b.updatedAt-a.updatedAt);return !noteFilter?list:list.filter(n=>[n.title,n.label,n.body].some(v=>lower(v).includes(noteFilter)))}
+      function visibleTodos(){const list=[...todos].sort((a,b)=>{if(a.completed!==b.completed)return a.completed?1:-1;if(a.dueDate&&b.dueDate)return a.dueDate.localeCompare(b.dueDate);if(a.dueDate)return-1;if(b.dueDate)return 1;return b.updatedAt-a.updatedAt});return todoView==="today"?list.filter(t=>t.dueDate===today()):list}
+      function updateClock(){
+        if(!clockTime)return;
+        const now=new Date();
+        clockTime.textContent=new Intl.DateTimeFormat(undefined,{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true}).format(now);
+        clockDate.textContent=new Intl.DateTimeFormat(undefined,{weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(now);
+        clockDay.textContent=new Intl.DateTimeFormat(undefined,{weekday:"long"}).format(now);
+        clockMonth.textContent=new Intl.DateTimeFormat(undefined,{month:"long"}).format(now);
+        clockDateNum.textContent=String(now.getDate()).padStart(2,"0");
+        clockYear.textContent=String(now.getFullYear());
+      }
+      function startClock(){
+        updateClock();
+        if(clockTimer)clearInterval(clockTimer);
+        clockTimer=window.setInterval(updateClock,1000);
+      }
+      function initAmbientBackground(){
+        if(!ambientCanvas||window.matchMedia("(prefers-reduced-motion: reduce)").matches)return ()=>{};
+        const ctx=ambientCanvas.getContext("2d",{alpha:true});
+        if(!ctx)return ()=>{};
+        let width=0,height=0,dpr=Math.min(window.devicePixelRatio||1,2),rafId=0,running=true;
+        const stars=Array.from({length:140},()=>spawnStar());
 
-    /* 4 ── Glowing orbs */
-    orbs.forEach(o => {
-      o.phase += 0.006;
-      o.x += o.vx + Math.sin(o.phase) * 0.25;
-      o.y += o.vy + Math.cos(o.phase * 0.8) * 0.2;
-      if (o.x < -o.r*2) o.x = W + o.r;
-      if (o.x > W+o.r*2) o.x = -o.r;
-      if (o.y < -o.r*2) o.y = H + o.r;
-      if (o.y > H+o.r*2) o.y = -o.r;
-      const pulse = 0.05 + 0.025 * Math.sin(o.phase * 2.4);
-      const og = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
-      og.addColorStop(0,   `rgba(${o.col},${pulse * 1.8})`);
-      og.addColorStop(0.4, `rgba(${o.col},${pulse})`);
-      og.addColorStop(1,   `rgba(${o.col},0)`);
-      ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2);
-      ctx.fillStyle = og; ctx.fill();
-    });
+        function spawnStar(){
+          return{
+            x:Math.random(),
+            y:Math.random(),
+            size:.7+Math.random()*2.5,
+            speed:.05+Math.random()*.18,
+            alpha:.25+Math.random()*.75,
+            twinkle:.008+Math.random()*.018
+          };
+        }
+        function resize(){
+          dpr=Math.min(window.devicePixelRatio||1,2);
+          width=window.innerWidth;
+          height=window.innerHeight;
+          ambientCanvas.width=Math.round(width*dpr);
+          ambientCanvas.height=Math.round(height*dpr);
+          ctx.setTransform(dpr,0,0,dpr,0,0);
+        }
+        function draw(){
+          if(!running)return;
+          ctx.clearRect(0,0,width,height);
+          const isDark=document.body.dataset.theme==="dark";
+          for(let i=0;i<stars.length;i++){
+            const star=stars[i];
+            star.x-=star.speed/Math.max(320,width);
+            if(star.x<-.03){
+              star.x=1.03;
+              star.y=Math.random();
+            }
+            star.alpha+=Math.sin((performance.now()*star.twinkle)/90)*0.003;
+            const px=star.x*width,py=star.y*height;
+            ctx.beginPath();
+            ctx.fillStyle=isDark
+              ? `rgba(255,255,255,${Math.max(.16,Math.min(.95,star.alpha))})`
+              : `rgba(255,245,210,${Math.max(.10,Math.min(.38,star.alpha*0.45))})`;
+            ctx.arc(px,py,star.size,0,Math.PI*2);
+            ctx.fill();
+            if(isDark&&star.size>1.7){
+              ctx.beginPath();
+              ctx.strokeStyle=`rgba(181, 215, 255, ${Math.max(.08,Math.min(.35,star.alpha*0.35))})`;
+              ctx.lineWidth=.6;
+              ctx.moveTo(px-4,py);
+              ctx.lineTo(px+4,py);
+              ctx.moveTo(px,py-4);
+              ctx.lineTo(px,py+4);
+              ctx.stroke();
+            }
+          }
+          rafId=requestAnimationFrame(draw);
+        }
+        function onVisibility(){
+          running=!document.hidden;
+          if(running&&!rafId)draw();
+          if(!running&&rafId){cancelAnimationFrame(rafId);rafId=0}
+        }
+        resize();
+        draw();
+        window.addEventListener("resize",resize);
+        document.addEventListener("visibilitychange",onVisibility);
+        return ()=>{
+          running=false;
+          if(rafId)cancelAnimationFrame(rafId);
+          window.removeEventListener("resize",resize);
+          document.removeEventListener("visibilitychange",onVisibility);
+        };
+      }
 
-    /* 5 ── Stars with twinkle + mouse parallax */
-    stars.forEach(s => {
-      s.x += s.drift;
-      if (s.x > W + 4) s.x = -4;
-      s.phase += s.twSpd;
-      const alpha = 0.35 + 0.65 * (Math.sin(s.phase) * 0.5 + 0.5);
-      const px = s.x + (mouse.x / W - 0.5) * s.r * 7;
-      const py = s.y + (mouse.y / H - 0.5) * s.r * 7;
-      ctx.beginPath(); ctx.arc(px, py, s.r, 0, Math.PI*2);
-      ctx.shadowBlur = s.r * 4;
-      ctx.shadowColor = `rgba(${s.col},${alpha * 0.6})`;
-      ctx.fillStyle = `rgba(${s.col},${alpha})`;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-    });
+      function renderAll(){renderNotes();renderTodos();renderWorkouts();renderCalories();renderHealth();renderStats();renderCharts()}
 
-    /* 6 ── Shooting stars */
-    shooters = shooters.filter(s => s.life > 0);
-    shooters.forEach(s => {
-      s.x += s.vx; s.y += s.vy; s.life -= s.decay;
-      const tx = s.x - s.vx * (s.tail / 12);
-      const ty = s.y - s.vy * (s.tail / 12);
-      const sg = ctx.createLinearGradient(tx, ty, s.x, s.y);
-      sg.addColorStop(0,   `rgba(255,255,255,0)`);
-      sg.addColorStop(0.7, `rgba(200,230,255,${s.life * 0.55})`);
-      sg.addColorStop(1,   `rgba(255,255,255,${s.life})`);
-      ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(s.x, s.y);
-      ctx.strokeStyle = sg;
-      ctx.lineWidth = Math.max(0.1, s.life * 2.2);
-      ctx.lineCap = 'round'; ctx.stroke();
-    });
+      function renderNotes(){
+        const items=filteredNotes(),pinned=items.filter(n=>n.pinned),others=items.filter(n=>!n.pinned);
+        renderNoteBucket(pinnedNotes,pinned,"No pinned notes yet.");
+        renderNoteBucket(otherNotes,others,pinned.length?"No other notes yet.":"Create your first note above.");
+      }
+      function renderNoteBucket(target,items,emptyText){
+        target.innerHTML="";
+        if(!items.length){target.innerHTML=`<div class="empty">${emptyText}</div>`;return}
+        items.forEach((note,index)=>{
+          const card=document.createElement("article");card.className="note-card";
+          card.innerHTML=`<div class="note-head"><div><h3></h3></div><div class="card-actions"><button class="icon-btn pin" type="button" aria-label="Toggle pin"></button><button class="icon-btn edit" type="button" aria-label="Edit note"></button><button class="icon-btn del" type="button" aria-label="Delete note"></button></div></div><div class="chip"></div><div class="check-note-list"></div><p class="note-body"></p><div class="note-foot"><span></span></div>`;
+          card.style.background=["#fff9db","#f8efff","#eaf5ff","#edf7ee","#fff0ea"][index%5];
+          if(document.body.dataset.theme==="dark") card.style.background=["#3a3320","#34253f","#21313f","#203224","#3d2a23"][index%5];
+          card.querySelector("h3").textContent=note.title;
+          card.querySelector(".chip").textContent=note.label||"General";
+          const checklistRows=normalizeChecklist(note.checklist).slice(0,4);
+          const checklistWrap=card.querySelector(".check-note-list");
+          if(checklistRows.length){
+            checklistRows.forEach((item)=>{
+              const row=document.createElement("label");
+              row.className="check-note-row";
+              row.innerHTML=`<input type="checkbox" disabled><span></span>`;
+              row.querySelector("input").checked=!!item.checked;
+              row.querySelector("span").textContent=item.text;
+              checklistWrap.appendChild(row);
+            });
+          }else{
+            checklistWrap.remove();
+          }
+          card.querySelector(".note-body").textContent=shorten(note.body,220);
+          card.querySelector(".note-foot span").textContent="Updated "+fmtTime(note.updatedAt);
+          const pinBtn=card.querySelector(".pin"),editBtn=card.querySelector(".edit"),delBtn=card.querySelector(".del");
+          pinBtn.innerHTML=svgPin();editBtn.innerHTML=svgEdit();delBtn.innerHTML=svgDelete();
+          card.tabIndex=0;
+          card.onclick=()=>openNoteEditor(note,card);
+          card.onkeydown=(event)=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();openNoteEditor(note,card)}};
+          pinBtn.onclick=(event)=>{event.stopPropagation();note.pinned=!note.pinned;note.updatedAt=Date.now();save(K_NOTES,notes);renderNotes()};
+          editBtn.onclick=(event)=>{event.stopPropagation();openNoteEditor(note,editBtn)};
+          delBtn.onclick=(event)=>{event.stopPropagation();if(confirm(`Delete note "${note.title}"?`)){notes=notes.filter(n=>n.id!==note.id);save(K_NOTES,notes);renderAll()}};
+          target.appendChild(card);
+        });
+      }
+      function openNoteEditor(note,trigger){
+        lastFocus=trigger;editNoteId.value=note.id;editNoteTitle.value=note.title;editNoteLabel.value=note.label||"";editNoteBody.value=note.body||"";editNotePinned.checked=!!note.pinned;editChecklist=normalizeChecklist(note.checklist);refreshEditChecklist();warn(editNoteWarn,"");updateComposerMeta();setChecklistVisibility(true);setPinnedButtonState();openModal(noteModalBack,editNoteTitle)
+      }
 
-    /* 7 ── Constellation particles */
-    pts.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0 || p.x > W) p.vx *= -1;
-      if (p.y < 0 || p.y > H) p.vy *= -1;
-      // Mouse repulsion
-      const dx = p.x - mouse.x, dy = p.y - mouse.y;
-      const d = Math.sqrt(dx*dx + dy*dy);
-      if (d < 130 && d > 0) { p.vx += (dx/d)*0.18; p.vy += (dy/d)*0.18; }
-      // Speed cap
-      const spd = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
-      if (spd > 1.4) { p.vx = p.vx/spd*1.4; p.vy = p.vy/spd*1.4; }
-    });
-    // Draw connections
-    for (let i = 0; i < pts.length; i++) {
-      for (let j = i+1; j < pts.length; j++) {
-        const dx = pts[i].x - pts[j].x, dy = pts[i].y - pts[j].y;
-        const d = Math.sqrt(dx*dx + dy*dy);
-        if (d < 140) {
-          const alpha = (1 - d/140) * 0.28;
-          ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y);
-          ctx.strokeStyle = `rgba(${pts[i].col},${alpha})`;
-          ctx.lineWidth = 0.7; ctx.stroke();
+      function renderTodos(){
+        const items=visibleTodos();todoList.innerHTML="";todoTabs.forEach(btn=>btn.classList.toggle("active",btn.dataset.view===todoView));
+        if(!items.length){todoList.innerHTML=`<div class="empty">${todoView==="today"?"No tasks due today.":"No tasks yet."}</div>`;return}
+        items.forEach(todo=>{
+          const card=document.createElement("article");card.className="todo-card"+(todo.completed?" done-item":"");
+          card.innerHTML=`<input class="check" type="checkbox" aria-label="Mark task complete"><div class="todo-main"><strong></strong><div class="badges"><span class="badge ${todo.completed?"done":"open"}">${todo.completed?"Completed":"Open"}</span><span class="badge due">${todo.dueDate?fmtDate(todo.dueDate):"No due date"}</span></div><p>${todo.completed&&todo.completedAt?"Finished "+fmtTime(todo.completedAt):"Created "+fmtTime(todo.createdAt)}</p></div><div class="card-actions"><button class="btn btn-soft edit" type="button">Edit</button><button class="btn danger del" type="button">Delete</button></div>`;
+          const check=card.querySelector(".check"),editBtn=card.querySelector(".edit"),delBtn=card.querySelector(".del");
+          card.querySelector("strong").textContent=todo.description;check.checked=!!todo.completed;
+          check.onchange=()=>{const was=todo.completed;todo.completed=check.checked;todo.updatedAt=Date.now();todo.completedAt=check.checked?Date.now():null;save(K_TODOS,todos);renderAll();if(!was&&check.checked&&voiceToggle.checked)say(pick(cheers))};
+          editBtn.onclick=()=>{lastFocus=editBtn;editTodoId.value=todo.id;editTodoText.value=todo.description;editTodoDate.value=todo.dueDate||"";warn(editTodoWarn,"");openModal(todoModalBack,editTodoText)};
+          delBtn.onclick=()=>{if(confirm(`Delete task "${todo.description}"?`)){todos=todos.filter(t=>t.id!==todo.id);save(K_TODOS,todos);renderAll()}};
+          todoList.appendChild(card);
+        });
+      }
+
+      function renderWorkouts(){
+        if(!workoutList)return;
+        const items=[...workouts].sort((a,b)=>new Date(b.date).getTime()-new Date(a.date).getTime()||b.updatedAt-a.updatedAt);
+        workoutList.innerHTML="";
+        if(!items.length){
+          workoutList.innerHTML=`<div class="empty">No workout sessions yet. Start with your next push, pull, or legs session.</div>`;
+        }else{
+          items.forEach((session)=>{
+            const card=document.createElement("article");
+            card.className="workout-card";
+            card.innerHTML=`<div class="workout-head"><div><h3></h3><div class="workout-meta"><span class="split-chip"></span><span></span><span></span></div></div><div class="card-actions"><button class="btn btn-soft toggle" type="button"></button><button class="btn danger del" type="button">Delete</button></div></div><p class="workout-note"></p>`;
+            card.querySelector("h3").textContent=session.name;
+            const meta=card.querySelectorAll(".workout-meta span");
+            meta[0].textContent=session.split;
+            meta[1].textContent=fmtDate(session.date);
+            meta[2].textContent=`${Math.round(num(session.duration)||0)} min • ${kcal(session.caloriesBurned)}`;
+            card.querySelector(".workout-note").textContent=session.notes||"No extra workout note.";
+            const toggleBtn=card.querySelector(".toggle");
+            toggleBtn.textContent=session.completed?"Completed":"Mark done";
+            toggleBtn.className=`btn ${session.completed?"btn-primary":"btn-soft"} toggle`;
+            toggleBtn.onclick=()=>{session.completed=!session.completed;session.updatedAt=Date.now();save(K_WORKOUTS,workouts);renderAll();if(session.completed&&voiceToggle.checked)say(`Workout complete. ${session.split} day logged.`)};
+            card.querySelector(".del").onclick=()=>{if(confirm(`Delete workout "${session.name}"?`)){workouts=workouts.filter((item)=>item.id!==session.id);save(K_WORKOUTS,workouts);renderAll()}};
+            workoutList.appendChild(card);
+          });
+        }
+        const todaySessions=workouts.filter((session)=>session.date===today());
+        const weekSessions=workouts.filter((session)=>session.date&&isThisWeek(session.date)&&session.completed);
+        const latest=[...items][0];
+        workoutTodayCount.textContent=String(todaySessions.length);
+        workoutBurnToday.textContent=kcal(burnForDate(today()));
+        workoutCompleteWeek.textContent=String(weekSessions.length);
+        workoutLatestSplit.textContent=latest?latest.split:"-";
+      }
+
+      function renderCalories(){
+        if(!calorieList)return;
+        const items=[...calorieLogs].sort((a,b)=>new Date(b.date).getTime()-new Date(a.date).getTime()||b.updatedAt-a.updatedAt);
+        calorieList.innerHTML="";
+        if(!items.length){
+          calorieList.innerHTML=`<div class="empty">No calorie notes yet. Add your first meal or snack to start tracking intake.</div>`;
+        }else{
+          items.forEach((entry)=>{
+            const card=document.createElement("article");
+            card.className="calorie-card";
+            card.innerHTML=`<div class="calorie-head"><div><h3></h3><div class="calorie-meta"><span></span><span></span></div></div><div class="card-actions"><button class="btn danger del" type="button">Delete</button></div></div><p class="calorie-note"></p>`;
+            card.querySelector("h3").textContent=entry.item;
+            const meta=card.querySelectorAll(".calorie-meta span");
+            meta[0].textContent=fmtDate(entry.date);
+            meta[1].textContent=kcal(entry.calories);
+            card.querySelector(".calorie-note").textContent=entry.notes||"No extra calories note.";
+            card.querySelector(".del").onclick=()=>{if(confirm(`Delete calorie log "${entry.item}"?`)){calorieLogs=calorieLogs.filter((item)=>item.id!==entry.id);save(K_CALORIES,calorieLogs);renderAll()}};
+            calorieList.appendChild(card);
+          });
+        }
+        const todayIntake=intakeForDate(today()),todayBurn=burnForDate(today()),todayNet=netForDate(today()),todayDeficit=actualDeficitForDate(today());
+        calorieTodayTotal.textContent=kcal(todayIntake);
+        burnedTodayTotal.textContent=kcal(todayBurn);
+        netTodayTotal.textContent=kcal(todayNet);
+        deficitTodayTotal.textContent=kcal(todayDeficit);
+      }
+
+      function renderHealth(){
+        const bmi=bmiNumber(),maintenance=num(health.maintenanceCalories),target=targetCalories(),netToday=netForDate(today()),actualDeficit=actualDeficitForDate(today()),remaining=target-netToday;
+        bmiValue.textContent=bmi?bmi.toFixed(1):"-";
+        bmiCategory.textContent=bmiText(bmi);
+        targetCaloriesValue.textContent=kcal(target);
+        netCaloriesValue.textContent=kcal(netToday);
+        actualDeficitValue.textContent=kcal(actualDeficit);
+        remainingTargetValue.textContent=kcal(remaining);
+        const targetDeficit=num(health.targetDeficit);
+        const meterBase=targetDeficit||1;
+        const meterWidth=Math.max(0,Math.min(100,(actualDeficit/meterBase)*100));
+        deficitMeter.style.width=`${meterWidth}%`;
+        if(!maintenance){
+          healthInsightText.textContent="Add maintenance calories to calculate your target calories and calorie deficit correctly.";
+        }else if(remaining>0){
+          healthInsightText.textContent=`You are ${kcal(remaining)} below your target calories right now. Keep logging meals and workouts for an accurate deficit.`;
+        }else{
+          healthInsightText.textContent=`You are ${kcal(Math.abs(remaining))} above your target calories right now. A lighter meal or workout can help rebalance the day.`;
         }
       }
-    }
-    // Draw dots
-    pts.forEach(p => {
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(${p.col},0.85)`;
-      ctx.shadowBlur = 7; ctx.shadowColor = `rgba(${p.col},0.55)`;
-      ctx.fill(); ctx.shadowBlur = 0;
-    });
 
-    T += 0.012;
-    requestAnimationFrame(drawFrame);
-  }
-  drawFrame();
-
-
-  /* ═══════════════════════════════════════════════
-     THEME
-  ═══════════════════════════════════════════════ */
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIcon = themeToggle.querySelector('i');
-
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  if (savedTheme === 'light') {
-    document.body.classList.add('light');
-    themeIcon.className = 'fas fa-sun';
-  }
-
-  themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('light');
-    const isLight = document.body.classList.contains('light');
-    themeIcon.className = isLight ? 'fas fa-sun' : 'fas fa-moon';
-    localStorage.setItem('theme', isLight ? 'light' : 'dark');
-  });
-
-  /* Theme modes */
-  const THEME_ORBS = {
-    neon:     [{ col:'20,200,160', r:100 },{ col:'34,197,94', r:80 }],
-    pink:     [{ col:'244,114,182', r:100 },{ col:'251,207,232', r:80 }],
-    forest:   [{ col:'22,163,74', r:100 },{ col:'20,184,166', r:80 }],
-    twilight: [{ col:'139,92,246', r:110 },{ col:'99,102,241', r:80 }],
-    ocean:    [{ col:'14,165,233', r:120 },{ col:'6,182,212', r:80 }],
-    ember:    [{ col:'249,115,22', r:100 },{ col:'239,68,68', r:80 }],
-    default:  [{ col:'56,189,248', r:90 },{ col:'139,92,246', r:110 },{ col:'16,185,129', r:75 },{ col:'251,113,133', r:65 }]
-  };
-
-  function applyThemeMode(mode) {
-    // Update orbs colors
-    const palette = THEME_ORBS[mode] || THEME_ORBS.default;
-    palette.forEach((cfg, i) => {
-      if (orbs[i]) { orbs[i].col = cfg.col; orbs[i].r = cfg.r; }
-    });
-    // Update aurora
-    if (mode === 'neon') {
-      auroraWaves[0].col = '20,200,160'; auroraWaves[1].col = '34,197,94';
-    } else if (mode === 'pink') {
-      auroraWaves[0].col = '244,114,182'; auroraWaves[1].col = '251,207,232';
-    } else if (mode === 'twilight') {
-      auroraWaves[0].col = '139,92,246'; auroraWaves[1].col = '99,102,241';
-    } else {
-      auroraWaves[0].col = '56,189,248'; auroraWaves[1].col = '16,185,129';
-      auroraWaves[2].col = '139,92,246'; auroraWaves[3].col = '251,113,133';
-    }
-    localStorage.setItem('themeMode', mode);
-  }
-  applyThemeMode(localStorage.getItem('themeMode') || 'default');
-
-
-  /* ═══════════════════════════════════════════════
-     TAB NAVIGATION
-  ═══════════════════════════════════════════════ */
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.tab + 'Tab').classList.remove('hidden');
-      if (btn.dataset.tab === 'stats') updateStatistics();
-      if (btn.dataset.tab === 'trash') renderTrash();
-    });
-  });
-
-
-  /* ═══════════════════════════════════════════════
-     MOBILE MENU
-  ═══════════════════════════════════════════════ */
-  const sidebar = document.getElementById('sidebar');
-  document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-    sidebar.classList.toggle('hidden');
-    sidebar.classList.toggle('open');
-    if (!sidebar.classList.contains('hidden')) {
-      let bd = document.getElementById('sideBackdrop');
-      if (!bd) {
-        bd = document.createElement('div');
-        bd.id = 'sideBackdrop';
-        bd.className = 'fixed inset-0 z-30 bg-black/50 md:hidden';
-        bd.onclick = () => { sidebar.classList.add('hidden'); sidebar.classList.remove('open'); bd.remove(); };
-        document.body.appendChild(bd);
+      function renderStats(){
+        const totalNotes=notes.length,totalTasks=todos.length,done=todos.filter(t=>t.completed).length,open=totalTasks-done,dueToday=todos.filter(t=>t.dueDate===today()&&!t.completed).length,doneToday=todos.filter(t=>t.completed&&sameDay(t.completedAt,Date.now())).length;
+        const weekStart=new Date();weekStart.setHours(0,0,0,0);weekStart.setDate(weekStart.getDate()-((weekStart.getDay()+6)%7));
+        const doneWeek=todos.filter(t=>t.completedAt&&t.completedAt>=weekStart.getTime()).length,rate=totalTasks?Math.round(done/totalTasks*100):0;
+        const workoutWeek=workouts.filter((session)=>session.date&&isThisWeek(session.date)&&session.completed).length;
+        const todayDeficit=actualDeficitForDate(today());
+        const todayIntake=intakeForDate(today());
+        const todayNet=netForDate(today());
+        const bmi=bmiNumber();
+        noteCount.textContent=totalNotes;taskCount.textContent=totalTasks;doneCount.textContent=done;todayCount.textContent=dueToday;
+        workoutWeekCount.textContent=String(workoutWeek);
+        deficitTodayStat.textContent=kcal(todayDeficit);
+        healthTargetCalories.textContent=kcal(targetCalories());
+        healthCaloriesToday.textContent=kcal(todayIntake);
+        healthNetToday.textContent=kcal(todayNet);
+        bmiOverview.textContent=bmi?bmi.toFixed(1):"-";
+        statToday.textContent=doneToday;statWeek.textContent=doneWeek;statOpen.textContent=open;statRate.textContent=rate+"%";statWorkoutWeek.textContent=String(workoutWeek);statDeficit.textContent=kcal(todayDeficit);
       }
-    }
-  });
-  document.getElementById('mobileSearchBtn').addEventListener('click', () =>
-    document.getElementById('searchInput').focus()
-  );
-
-
-  /* ═══════════════════════════════════════════════
-     VIEW TOGGLE
-  ═══════════════════════════════════════════════ */
-  const viewToggle = document.getElementById('viewToggle');
-  const viewIcon = viewToggle.querySelector('i');
-  viewToggle.addEventListener('click', () => {
-    document.getElementById('notesTab').classList.toggle('list-view');
-    const isList = document.getElementById('notesTab').classList.contains('list-view');
-    viewIcon.className = isList ? 'fas fa-list' : 'fas fa-th-large';
-  });
-
-
-  /* ═══════════════════════════════════════════════
-     SEARCH
-  ═══════════════════════════════════════════════ */
-  let searchQuery = '';
-  document.getElementById('searchInput').addEventListener('input', function () {
-    searchQuery = this.value.toLowerCase();
-    renderNotes();
-  });
-
-
-  /* ═══════════════════════════════════════════════
-     SETTINGS
-  ═══════════════════════════════════════════════ */
-  const settingsModal  = document.getElementById('settingsModal');
-  const themeModeSelect = document.getElementById('themeMode');
-  const settingBgAnim  = document.getElementById('settingBgAnim');
-
-  document.getElementById('settingsBtn').addEventListener('click', () => {
-    themeModeSelect.value = localStorage.getItem('themeMode') || 'default';
-    settingBgAnim.checked = localStorage.getItem('settingBgAnim') !== 'false';
-    settingsModal.classList.remove('hidden');
-  });
-  document.getElementById('closeSettings').addEventListener('click', () => settingsModal.classList.add('hidden'));
-
-  document.getElementById('saveSettings').addEventListener('click', () => {
-    applyThemeMode(themeModeSelect.value);
-    animBg = settingBgAnim.checked;
-    localStorage.setItem('settingBgAnim', settingBgAnim.checked);
-    settingsModal.classList.add('hidden');
-    showToast('Settings saved', 'fas fa-check-circle text-emerald-400');
-  });
-
-  // Restore setting on load
-  if (localStorage.getItem('settingBgAnim') === 'false') animBg = false;
-
-
-  /* ═══════════════════════════════════════════════
-     LABELS
-  ═══════════════════════════════════════════════ */
-  let labels = JSON.parse(localStorage.getItem('labels')) || [];
-  let activeLabel = null;
-  const labelsList = document.getElementById('labelsList');
-
-  function renderLabels() {
-    labelsList.innerHTML = '';
-    labels.forEach(label => {
-      const el = document.createElement('div');
-      el.className = 'flex items-center justify-between group';
-      el.innerHTML = `
-        <a href="#" class="sidebar-item flex-1 text-sm" data-label-name="${label}">
-          <i class="fas fa-tag w-4 text-xs"></i><span>${label}</span>
-        </a>
-        <button class="text-slate-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition px-1"
-                data-label-delete="${label}">
-          <i class="fas fa-times text-xs"></i>
-        </button>`;
-      labelsList.appendChild(el);
-    });
-    labelsList.querySelectorAll('[data-label-name]').forEach(el => {
-      el.addEventListener('click', e => {
-        e.preventDefault();
-        activeLabel = el.dataset.labelName;
-        currentFilter = 'all';
-        document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-        document.querySelector('[data-filter="all"]').classList.add('active');
-        renderNotes();
-      });
-    });
-    labelsList.querySelectorAll('[data-label-delete]').forEach(btn => {
-      btn.addEventListener('click', e => {
-        e.stopPropagation();
-        const lbl = btn.dataset.labelDelete;
-        if (!confirm(`Delete label "${lbl}"?`)) return;
-        labels = labels.filter(l => l !== lbl);
-        localStorage.setItem('labels', JSON.stringify(labels));
-        notes.forEach(n => { if (n.labels) n.labels = n.labels.filter(l => l !== lbl); });
-        saveNotes();
-        if (activeLabel === lbl) activeLabel = null;
-        renderLabels(); renderNotes();
-      });
-    });
-  }
-
-  document.getElementById('addLabelBtn').addEventListener('click', () => {
-    const name = prompt('New label name:');
-    if (!name || !name.trim()) return;
-    const t = name.trim();
-    if (labels.includes(t)) { alert('Label already exists.'); return; }
-    labels.push(t);
-    localStorage.setItem('labels', JSON.stringify(labels));
-    renderLabels();
-  });
-
-  document.getElementById('clearLabelsBtn').addEventListener('click', () => {
-    if (!confirm('Clear all labels?')) return;
-    labels = [];
-    notes.forEach(n => n.labels = []);
-    localStorage.setItem('labels', JSON.stringify(labels));
-    saveNotes(); renderLabels(); renderNotes();
-  });
-
-  renderLabels();
-
-
-  /* ═══════════════════════════════════════════════
-     SIDEBAR FILTER
-  ═══════════════════════════════════════════════ */
-  let currentFilter = 'all';
-  document.querySelectorAll('.sidebar-item[data-filter]').forEach(item => {
-    item.addEventListener('click', e => {
-      e.preventDefault();
-      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-      currentFilter = item.dataset.filter;
-      activeLabel = null;
-      // Switch to right tab
-      if (currentFilter === 'trash') {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-        document.querySelector('[data-tab="trash"]').classList.add('active');
-        document.getElementById('trashTab').classList.remove('hidden');
-        renderTrash();
-      } else {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-        document.querySelector('[data-tab="notes"]').classList.add('active');
-        document.getElementById('notesTab').classList.remove('hidden');
-        renderNotes();
-      }
-    });
-  });
-
-
-  /* ═══════════════════════════════════════════════
-     NOTES DATA
-  ═══════════════════════════════════════════════ */
-  let notes = JSON.parse(localStorage.getItem('notes')) || [];
-  let currentNoteId = null;
-  const notesContainer = document.getElementById('notesContainer');
-  const emptyState     = document.getElementById('emptyState');
-
-  function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-  }
-  function formatDate(date) {
-    const d = new Date(date), now = new Date();
-    const diff = now - d;
-    const mins = Math.floor(diff/60000), hrs = Math.floor(diff/3600000), days = Math.floor(diff/86400000);
-    if (mins < 1) return 'Just now';
-    if (mins < 60) return `${mins}m ago`;
-    if (hrs < 24) return `${hrs}h ago`;
-    if (days < 7) return `${days}d ago`;
-    return d.toLocaleDateString();
-  }
-  function saveNotes() {
-    localStorage.setItem('notes', JSON.stringify(notes));
-    updateQuickStats();
-  }
-
-  /* FIX: always clear container first, THEN check empty */
-  function renderNotes() {
-    notesContainer.innerHTML = '';   // ← FIXED: was not clearing before early return
-    let filtered = notes.filter(n => {
-      switch (currentFilter) {
-        case 'all':       return !n.trashed && !n.archived;
-        case 'reminders': return !n.trashed && n.reminder;
-        case 'labels':    return !n.trashed && !n.archived && (n.labels||[]).length > 0;
-        case 'archive':   return !n.trashed && n.archived;
-        default:          return !n.trashed && !n.archived;
-      }
-    });
-    if (activeLabel)  filtered = filtered.filter(n => (n.labels||[]).includes(activeLabel));
-    if (searchQuery)  filtered = filtered.filter(n =>
-      (n.title||'').toLowerCase().includes(searchQuery) ||
-      (n.content||'').toLowerCase().includes(searchQuery) ||
-      (n.labels||[]).join(' ').toLowerCase().includes(searchQuery)
-    );
-    const sorted = filtered.sort((a,b) => (b.pinned - a.pinned) || (new Date(b.updatedAt) - new Date(a.updatedAt)));
-
-    if (sorted.length === 0) {
-      emptyState.classList.remove('hidden');
-      return;
-    }
-    emptyState.classList.add('hidden');
-    sorted.forEach(n => notesContainer.appendChild(renderNoteCard(n)));
-  }
-
-  function renderNoteCard(note) {
-    const card = document.createElement('div');
-    card.className = 'note-card glass rounded-xl p-4 mb-4 fade-in cursor-pointer';
-    if (note.color && note.color !== '#ffffff') card.style.backgroundColor = note.color;
-    card.dataset.id = note.id;
-    card.innerHTML = `
-      <div class="flex justify-between items-start gap-2">
-        <h3 class="font-bold text-base leading-snug">${note.title || 'Untitled'}</h3>
-        <button class="text-slate-400 hover:text-sky-400 shrink-0 transition-colors" data-action="pin" title="${note.pinned ? 'Unpin' : 'Pin'}">
-          <i class="fas fa-thumbtack text-sm ${note.pinned ? 'text-sky-400' : ''}"></i>
-        </button>
-      </div>
-      ${(note.labels||[]).length ? `<div class="mt-2 flex flex-wrap gap-1">
-        ${note.labels.map(l=>`<span class="text-xs bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded-full">${l}</span>`).join('')}
-      </div>` : ''}
-      ${note.content ? `<p class="mt-2 text-sm text-slate-300 line-clamp-4">${note.content}</p>` : ''}
-      ${(note.checklist||[]).length ? `<div class="mt-3 space-y-1">
-        ${note.checklist.map(i=>`<div class="flex items-center gap-2 text-xs">
-          <i class="fas fa-${i.checked ? 'check-square text-emerald-400' : 'square text-slate-500'}"></i>
-          <span class="${i.checked ? 'line-through text-slate-500' : 'text-slate-300'}">${i.text}</span>
-        </div>`).join('')}
-      </div>` : ''}
-      ${note.reminder ? `<div class="mt-2 text-xs text-amber-400"><i class="fas fa-bell mr-1"></i>${new Date(note.reminder).toLocaleString()}</div>` : ''}
-      <div class="mt-3 flex justify-between items-center">
-        <span class="text-xs text-slate-500">${formatDate(note.updatedAt)}</span>
-        <div class="flex gap-2">
-          <button class="text-slate-400 hover:text-amber-400 transition-colors" data-action="color" data-id="${note.id}" title="Color"><i class="fas fa-palette text-xs"></i></button>
-          <button class="text-slate-400 hover:text-sky-400 transition-colors" data-action="archive" title="${note.archived ? 'Unarchive' : 'Archive'}"><i class="fas fa-${note.archived ? 'inbox' : 'archive'} text-xs"></i></button>
-          <button class="text-slate-400 hover:text-red-400 transition-colors" data-action="trash" title="Delete"><i class="fas fa-trash text-xs"></i></button>
-        </div>
-      </div>`;
-    card.addEventListener('click', e => { if (!e.target.closest('button')) openEditModal(note.id); });
-    card.querySelectorAll('[data-action]').forEach(btn => {
-      btn.addEventListener('click', e => { e.stopPropagation(); handleNoteAction(note.id, btn.dataset.action); });
-    });
-    return card;
-  }
-
-  function handleNoteAction(id, action) {
-    const note = notes.find(n => n.id === id);
-    if (!note) return;
-    if (action === 'pin')    { note.pinned = !note.pinned; }
-    if (action === 'archive'){ note.archived = !note.archived; }
-    if (action === 'color')  { showColorPicker(note); return; }
-    if (action === 'trash')  { moveToTrash(id); return; }
-    note.updatedAt = new Date().toISOString();
-    saveNotes(); renderNotes();
-  }
-
-  /* ── Color picker ── */
-  const COLOR_PALETTE = [
-    '#07111e','#fecaca','#fed7aa','#fef08a','#bbf7d0',
-    '#bfdbfe','#e9d5ff','#fbcfe8','#d1fae5','#1e293b'
-  ];
-  function showColorPicker(note) {
-    document.querySelectorAll('.color-popup').forEach(p => p.remove());
-    const popup = document.createElement('div');
-    popup.className = 'color-popup fixed z-50 glass rounded-xl p-3 shadow-2xl';
-    popup.innerHTML = `<div class="flex flex-wrap gap-2 w-52">${
-      COLOR_PALETTE.map(c => `<div class="color-dot ${c===note.color?'active':''}" style="background:${c};border:1.5px solid rgba(255,255,255,0.15)" data-color="${c}"></div>`).join('')
-    }</div>`;
-    const btn = document.querySelector(`[data-action="color"][data-id="${note.id}"]`);
-    if (btn) {
-      const r = btn.getBoundingClientRect();
-      popup.style.left = Math.min(r.left, W - 240) + 'px';
-      popup.style.top  = r.bottom + 8 + 'px';
-    } else {
-      popup.style.left = '50%'; popup.style.top = '50%';
-      popup.style.transform = 'translate(-50%,-50%)';
-    }
-    document.body.appendChild(popup);
-    popup.querySelectorAll('.color-dot').forEach(dot => {
-      dot.addEventListener('click', () => {
-        note.color = dot.dataset.color;
-        note.updatedAt = new Date().toISOString();
-        saveNotes(); renderNotes(); popup.remove();
-      });
-    });
-    setTimeout(() => {
-      const close = e => { if (!popup.contains(e.target)) { popup.remove(); document.removeEventListener('click', close); } };
-      document.addEventListener('click', close);
-    }, 0);
-  }
-
-  /* ── Create note ── */
-  function createNote(title, content = '', type = 'text') {
-    const note = {
-      id: generateId(), title, content, type,
-      color: '', pinned: false, archived: false, trashed: false,
-      labels: [], checklist: type === 'checklist' ? [{ text: 'Task 1', checked: false }] : [],
-      reminder: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    notes.push(note);
-    saveNotes(); // saveNotes already calls updateQuickStats
-    renderNotes();
-    return note;
-  }
-
-  /* ── Quick add ── */
-  document.getElementById('quickAddBtn').addEventListener('click', () => {
-    const v = document.getElementById('quickTitle').value.trim();
-    if (v) { createNote(v); document.getElementById('quickTitle').value = ''; }
-  });
-  document.getElementById('quickTitle').addEventListener('keypress', e => {
-    if (e.key === 'Enter') document.getElementById('quickAddBtn').click();
-  });
-
-  /* ── Edit modal ── */
-  function openEditModal(id) {
-    const note = notes.find(n => n.id === id);
-    if (!note) return;
-    currentNoteId = id;
-    document.getElementById('modalTitle').value   = note.title || '';
-    document.getElementById('modalContent').value = note.content || '';
-    document.getElementById('modalLabels').value  = (note.labels || []).join(', ');
-    const modal = document.getElementById('noteModal');
-    modal.classList.remove('modal-enter');
-    modal.classList.remove('hidden');
-    setTimeout(() => modal.classList.add('modal-enter'), 10);
-  }
-  function closeEditModal() {
-    document.getElementById('noteModal').classList.add('hidden');
-    currentNoteId = null;
-  }
-  document.getElementById('closeModal').addEventListener('click', closeEditModal);
-  document.getElementById('noteModal').addEventListener('click', e => {
-    if (e.target === document.getElementById('noteModal')) closeEditModal();
-  });
-
-  /* Auto-save */
-  function debounce(fn, ms) {
-    let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
-  }
-  const autoSave = debounce(() => {
-    if (!currentNoteId) return;
-    const note = notes.find(n => n.id === currentNoteId);
-    if (note) {
-      note.title   = document.getElementById('modalTitle').value;
-      note.content = document.getElementById('modalContent').value;
-      note.updatedAt = new Date().toISOString();
-      saveNotes();
-    }
-  }, 600);
-  document.getElementById('modalTitle').addEventListener('input',   autoSave);
-  document.getElementById('modalContent').addEventListener('input', autoSave);
-
-  document.getElementById('saveNote').addEventListener('click', () => {
-    if (!currentNoteId) { closeEditModal(); return; }
-    const note = notes.find(n => n.id === currentNoteId);
-    if (note) {
-      note.title   = document.getElementById('modalTitle').value;
-      note.content = document.getElementById('modalContent').value;
-      note.labels  = document.getElementById('modalLabels').value.split(',').map(l => l.trim()).filter(Boolean);
-      note.updatedAt = new Date().toISOString();
-      saveNotes(); renderNotes(); renderLabels();
-    }
-    closeEditModal();
-  });
-
-  /* Modal toolbar buttons */
-  document.getElementById('modalChecklistBtn').addEventListener('click', e => {
-    e.stopPropagation();
-    const note = notes.find(n => n.id === currentNoteId);
-    if (!note) return;
-    const item = prompt('Add checklist item:');
-    if (!item?.trim()) return;
-    note.checklist = note.checklist || [];
-    note.checklist.push({ text: item.trim(), checked: false });
-    note.updatedAt = new Date().toISOString();
-    saveNotes(); renderNotes(); openEditModal(note.id);
-  });
-  document.getElementById('modalReminderBtn').addEventListener('click', e => {
-    e.stopPropagation();
-    const note = notes.find(n => n.id === currentNoteId);
-    if (!note) return;
-    const d = prompt('Set reminder (YYYY-MM-DD HH:MM):');
-    if (!d) return;
-    const dt = new Date(d);
-    if (isNaN(dt)) { alert('Invalid date.'); return; }
-    note.reminder = dt.toISOString();
-    note.updatedAt = new Date().toISOString();
-    saveNotes(); renderNotes(); openEditModal(note.id);
-  });
-  document.getElementById('modalColorBtn').addEventListener('click', e => {
-    e.stopPropagation();
-    const note = notes.find(n => n.id === currentNoteId);
-    if (note) showColorPicker(note);
-  });
-
-
-  /* ═══════════════════════════════════════════════
-     TOAST
-  ═══════════════════════════════════════════════ */
-  let toastTimer;
-  function showToast(msg, iconClass = 'fas fa-info-circle text-sky-400', duration = 3500) {
-    clearTimeout(toastTimer);
-    const toast = document.getElementById('toast');
-    document.getElementById('toastIcon').className = iconClass;
-    document.getElementById('toastMsg').textContent = msg;
-    document.getElementById('undoDelete').classList.add('hidden');
-    toast.classList.remove('hidden');
-    toastTimer = setTimeout(() => toast.classList.add('hidden'), duration);
-  }
-  function showUndoToast(id) {
-    clearTimeout(toastTimer);
-    const toast = document.getElementById('toast');
-    document.getElementById('toastIcon').className = 'fas fa-trash-restore text-sky-400';
-    document.getElementById('toastMsg').textContent = 'Note moved to trash.';
-    const undo = document.getElementById('undoDelete');
-    undo.classList.remove('hidden');
-    undo.onclick = () => {
-      const note = notes.find(n => n.id === id);
-      if (note) { note.trashed = false; note.updatedAt = new Date().toISOString(); }
-      trash = trash.filter(t => t.id !== id);
-      saveNotes(); saveTrash(); renderNotes(); renderTrash();
-      toast.classList.add('hidden');
-    };
-    toast.classList.remove('hidden');
-    toastTimer = setTimeout(() => toast.classList.add('hidden'), 5500);
-  }
-  document.getElementById('closeToast').addEventListener('click', () =>
-    document.getElementById('toast').classList.add('hidden')
-  );
-
-
-  /* ═══════════════════════════════════════════════
-     TRASH
-  ═══════════════════════════════════════════════ */
-  let trash = JSON.parse(localStorage.getItem('trash')) || [];
-  function saveTrash() { localStorage.setItem('trash', JSON.stringify(trash)); }
-
-  function moveToTrash(id) {
-    const note = notes.find(n => n.id === id);
-    if (!note) return;
-    note.trashed = true;
-    note.updatedAt = new Date().toISOString();
-    if (!trash.find(t => t.id === id)) trash.push({ ...note, deletedAt: new Date().toISOString() });
-    saveNotes(); saveTrash(); renderNotes(); renderTrash();
-    showUndoToast(id);
-  }
-
-  function renderTrash() {
-    const container  = document.getElementById('trashContainer');
-    const emptyState = document.getElementById('emptyTrashState');
-    container.innerHTML = '';
-    if (trash.length === 0) { emptyState.classList.remove('hidden'); return; }
-    emptyState.classList.add('hidden');
-    trash.forEach(item => {
-      const el = document.createElement('div');
-      el.className = 'trash-item glass rounded-xl p-4 fade-in';
-      el.innerHTML = `
-        <div class="flex justify-between items-start mb-1">
-          <h3 class="font-bold">${item.title || 'Untitled'}</h3>
-          <span class="text-xs text-slate-500">Deleted ${formatDate(item.deletedAt)}</span>
-        </div>
-        <p class="text-sm text-slate-400 mt-1">${(item.content||'').substring(0,120)}${(item.content||'').length>120?'…':''}</p>
-        <div class="mt-3 flex gap-3 justify-end">
-          <button class="restore-item text-sky-400 hover:text-sky-300 text-sm font-medium" data-id="${item.id}">
-            <i class="fas fa-undo mr-1"></i>Restore
-          </button>
-          <button class="delete-forever text-red-400 hover:text-red-300 text-sm font-medium" data-id="${item.id}">
-            <i class="fas fa-trash mr-1"></i>Delete Forever
-          </button>
-        </div>`;
-      container.appendChild(el);
-    });
-    container.querySelectorAll('.restore-item').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.dataset.id;
-        const note = notes.find(n => n.id === id);
-        if (note) { note.trashed = false; note.updatedAt = new Date().toISOString(); }
-        else {
-          const item = trash.find(t => t.id === id);
-          if (item) notes.push({ ...item, trashed: false });
+      function weekData(){const map={},labels=[],vals=[];todos.forEach(t=>{if(t.completedAt){const key=new Date(t.completedAt).toLocaleDateString("en-CA");map[key]=(map[key]||0)+1}});for(let i=6;i>=0;i--){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-i);const k=d.toLocaleDateString("en-CA");labels.push(new Intl.DateTimeFormat(undefined,{weekday:"short"}).format(d));vals.push(map[k]||0)}return{labels,vals}}
+      function monthData(){const now=new Date(),weeks=[0,0,0,0,0,0];todos.forEach(t=>{if(!t.completedAt)return;const d=new Date(t.completedAt);if(d.getFullYear()!==now.getFullYear()||d.getMonth()!==now.getMonth())return;weeks[Math.floor((d.getDate()-1)/7)]++});return weeks.map((count,i)=>({label:"Week "+(i+1),count})).filter((w,i,a)=>i<4||w.count>0||i===a.length-1)}
+      function calorieWeekData(){
+        const labels=[],netVals=[],targetVals=[],target=targetCalories();
+        for(let i=6;i>=0;i--){
+          const d=new Date();
+          d.setHours(0,0,0,0);
+          d.setDate(d.getDate()-i);
+          const key=d.toLocaleDateString("en-CA");
+          labels.push(new Intl.DateTimeFormat(undefined,{weekday:"short"}).format(d));
+          netVals.push(netForDate(key));
+          targetVals.push(target);
         }
-        trash = trash.filter(t => t.id !== id);
-        saveNotes(); saveTrash(); renderTrash(); renderNotes();
-        showToast('Note restored!', 'fas fa-undo text-sky-400');
-      });
-    });
-    container.querySelectorAll('.delete-forever').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (!confirm('Permanently delete this note?')) return;
-        const id = btn.dataset.id;
-        trash = trash.filter(t => t.id !== id);
-        notes = notes.filter(n => n.id !== id);
-        saveNotes(); saveTrash(); renderTrash(); renderNotes();
-        showToast('Note permanently deleted', 'fas fa-trash text-red-400');
-      });
-    });
-  }
-
-  /* FIX: emptyTrashBtn also removes trashed notes from main array */
-  document.getElementById('emptyTrashBtn').addEventListener('click', () => {
-    if (!confirm('Permanently delete all items in trash?')) return;
-    const trashIds = new Set(trash.map(t => t.id));
-    notes = notes.filter(n => !trashIds.has(n.id));   // ← FIXED: remove from notes too
-    trash = [];
-    saveNotes(); saveTrash(); renderTrash(); renderNotes();
-    showToast('Trash emptied', 'fas fa-trash text-red-400');
-  });
-
-  /* FIX: restoreAll does NOT push duplicates, just flips trashed flag */
-  document.getElementById('restoreAllBtn').addEventListener('click', () => {
-    if (trash.length === 0) return;
-    trash.forEach(item => {
-      const existing = notes.find(n => n.id === item.id);
-      if (existing) {
-        existing.trashed = false;                          // ← FIXED: just update flag
-        existing.updatedAt = new Date().toISOString();
-      } else {
-        notes.push({ ...item, trashed: false });           // only add if truly missing
+        return{labels,netVals,targetVals};
       }
-    });
-    trash = [];
-    saveNotes(); saveTrash(); renderTrash(); renderNotes();
-    showToast('All items restored!', 'fas fa-undo text-sky-400');
-  });
-
-  renderTrash();
-
-
-  /* ═══════════════════════════════════════════════
-     TASKS
-  ═══════════════════════════════════════════════ */
-  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-  const tasksContainer = document.getElementById('tasksContainer');
-  const emptyTasksState = document.getElementById('emptyTasksState');
-
-  function saveTasks() {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    updateQuickStats();
-  }
-
-  function renderTasks() {
-    tasksContainer.innerHTML = '';
-    const sorted = [...tasks].sort((a,b) => new Date(b.date) - new Date(a.date));
-    if (sorted.length === 0) { emptyTasksState.classList.remove('hidden'); return; }
-    emptyTasksState.classList.add('hidden');
-    sorted.forEach(task => {
-      const el = document.createElement('div');
-      el.className = 'task-card glass rounded-xl p-4 flex items-center gap-4 fade-in';
-      el.innerHTML = `
-        <input type="checkbox" class="w-5 h-5 accent-sky-400 cursor-pointer" ${task.completed ? 'checked' : ''} data-id="${task.id}">
-        <span class="flex-1 text-sm ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${task.text}</span>
-        <span class="text-xs text-slate-500 shrink-0">${formatDate(task.date)}</span>
-        <button class="del-task text-slate-400 hover:text-red-400 transition-colors" data-id="${task.id}">
-          <i class="fas fa-trash text-xs"></i>
-        </button>`;
-      tasksContainer.appendChild(el);
-    });
-    tasksContainer.querySelectorAll('input[type=checkbox]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const t = tasks.find(t => t.id === cb.dataset.id);
-        if (t) { t.completed = cb.checked; saveTasks(); renderTasks(); }
-      });
-    });
-    tasksContainer.querySelectorAll('.del-task').forEach(btn => {
-      btn.addEventListener('click', () => {
-        tasks = tasks.filter(t => t.id !== btn.dataset.id);
-        saveTasks(); renderTasks();
-      });
-    });
-  }
-
-  document.getElementById('addTaskBtn').addEventListener('click', () => {
-    const v = document.getElementById('taskInput').value.trim();
-    if (v) {
-      tasks.push({ id: generateId(), text: v, completed: false, date: new Date().toISOString() });
-      document.getElementById('taskInput').value = '';
-      saveTasks(); renderTasks();
-    }
-  });
-  document.getElementById('taskInput').addEventListener('keypress', e => {
-    if (e.key === 'Enter') document.getElementById('addTaskBtn').click();
-  });
-  renderTasks();
-
-
-  /* ═══════════════════════════════════════════════
-     STATISTICS
-  ═══════════════════════════════════════════════ */
-  function updateStatistics() {
-    const total = notes.length;
-    const done  = tasks.filter(t => t.completed).length;
-    const rate  = tasks.length ? Math.round(done/tasks.length*100) : 0;
-    document.getElementById('statTotalNotes').textContent     = total;
-    document.getElementById('statTasksCompleted').textContent = done;
-    document.getElementById('statCompletionRate').textContent = rate + '%';
-    const monthly = new Array(12).fill(0);
-    notes.forEach(n => monthly[new Date(n.createdAt).getMonth()]++);
-    drawMonthlyChart(monthly);
-    drawYearlyHeatmap();
-  }
-
-  function drawMonthlyChart(data) {
-    const cnv = document.getElementById('monthlyChart');
-    if (!cnv) return;
-    const c = cnv.getContext('2d');
-    const W = cnv.offsetWidth || 600;
-    cnv.width = W; cnv.height = 120;
-    const h = cnv.height;
-    const maxV = Math.max(...data, 1);
-    const bw = W / 12;
-    c.clearRect(0, 0, W, h);
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    data.forEach((v, i) => {
-      const bh = Math.max(2, (v/maxV) * (h-30));
-      const x = i * bw + bw*0.2;
-      const y = h - bh - 20;
-      const grad = c.createLinearGradient(0, y, 0, h-20);
-      grad.addColorStop(0, 'rgba(56,189,248,0.9)');
-      grad.addColorStop(1, 'rgba(16,185,129,0.6)');
-      c.fillStyle = grad;
-      c.beginPath();
-      c.roundRect ? c.roundRect(x, y, bw*0.6, bh, [4,4,0,0]) : c.rect(x, y, bw*0.6, bh);
-      c.fill();
-      c.fillStyle = '#64748b'; c.font = '11px Sora'; c.textAlign = 'center';
-      c.fillText(months[i], x + bw*0.3, h-4);
-      if (v > 0) {
-        c.fillStyle = '#38bdf8'; c.font = 'bold 11px Sora';
-        c.fillText(v, x + bw*0.3, y - 4);
-      }
-    });
-  }
-
-  function drawYearlyHeatmap() {
-    const hm = document.getElementById('yearlyHeatmap');
-    if (!hm) return;
-    hm.innerHTML = '';
-    const monthly = new Array(12).fill(0);
-    tasks.forEach(t => { if (t.completed) monthly[new Date(t.date).getMonth()]++; });
-    const maxV = Math.max(...monthly, 1);
-    const months = ['J','F','M','A','M','J','J','A','S','O','N','D'];
-    months.forEach((m, i) => {
-      const intensity = monthly[i] / maxV;
-      const cell = document.createElement('div');
-      cell.className = 'stat-card glass rounded-lg flex items-center justify-center font-bold text-sm aspect-square cursor-help';
-      cell.style.background = `rgba(56,189,248,${0.08 + intensity * 0.65})`;
-      cell.textContent = m;
-      cell.title = `${monthly[i]} tasks in month ${i+1}`;
-      hm.appendChild(cell);
-    });
-  }
-
-
-  /* ═══════════════════════════════════════════════
-     QUICK STATS (FIX: elements now exist in HTML)
-  ═══════════════════════════════════════════════ */
-  function updateQuickStats() {
-    const today = new Date().toDateString();
-    const todayTasks = tasks.filter(t => new Date(t.date).toDateString() === today);
-    document.getElementById('totalNotesCount').textContent  = notes.length;
-    document.getElementById('tasksCountToday').textContent  = todayTasks.length;
-    document.getElementById('completedTodayCount').textContent = todayTasks.filter(t => t.completed).length;
-  }
-  updateQuickStats();
-
-
-  /* ═══════════════════════════════════════════════
-     EXPORT / IMPORT (FIX: buttons now exist in HTML)
-  ═══════════════════════════════════════════════ */
-  document.getElementById('exportBtn').addEventListener('click', () => {
-    const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `ashvinz-notes-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    showToast('Notes exported!', 'fas fa-file-export text-emerald-400');
-  });
-
-  document.getElementById('importBtn').addEventListener('click', () => {
-    const input = document.createElement('input');
-    input.type = 'file'; input.accept = '.json,application/json';
-    input.onchange = e => {
-      const file = e.target.files[0]; if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        try {
-          const imported = JSON.parse(ev.target.result);
-          if (!Array.isArray(imported)) throw new Error('Expected array of notes');
-          const valid = imported.filter(n => n && (n.title || n.content));
-          const existIds = new Set(notes.map(n => n.id));
-          const newNotes = valid.filter(n => !existIds.has(n.id));
-          notes.unshift(...newNotes);
-          saveNotes(); renderNotes();
-          showToast(`Imported ${newNotes.length} notes!`, 'fas fa-file-import text-violet-400');
-        } catch(err) {
-          alert('Import failed: ' + err.message);
+      function renderCharts(){
+        const w=weekData(),m=monthData(),c=calorieWeekData();monthRows.innerHTML=m.map(r=>`<tr><td>${r.label}</td><td>${r.count}</td></tr>`).join("");
+        if(typeof Chart==="undefined")return;
+        const css=getComputedStyle(document.documentElement),muted=css.getPropertyValue("--muted").trim(),text=css.getPropertyValue("--text").trim(),accent="#f6a48d",accent2="#7aa7ff",tooltipBg="#1f2937";
+        const common={
+          responsive:true,
+          maintainAspectRatio:false,
+          layout:{padding:{left:8,right:8,bottom:8}},
+          plugins:{
+            legend:{display:false},
+            tooltip:{backgroundColor:tooltipBg,titleColor:"#fff",bodyColor:"#fff"}
+          },
+          scales:{
+            x:{
+              offset:true,
+              ticks:{color:text,font:{size:13,weight:"600"},padding:10},
+              grid:{display:false},
+              border:{display:false}
+            },
+            y:{
+              beginAtZero:true,
+              grace:"10%",
+              ticks:{precision:0,color:muted,font:{size:12,weight:"600"},padding:8},
+              grid:{color:"rgba(125,138,164,.16)"},
+              border:{display:false}
+            }
+          }
+        };
+        if(!weekChart)weekChart=new Chart(weekChartCanvas,{type:"bar",data:{labels:w.labels,datasets:[{data:w.vals,borderRadius:10,backgroundColor:[accent,accent,accent,accent,accent,accent,accent]}]},options:common});
+        else{weekChart.data.labels=w.labels;weekChart.data.datasets[0].data=w.vals;weekChart.data.datasets[0].backgroundColor=[accent,accent,accent,accent,accent,accent,accent];weekChart.options=common;weekChart.update()}
+        if(!monthChart)monthChart=new Chart(monthChartCanvas,{type:"line",data:{labels:m.map(x=>x.label),datasets:[{data:m.map(x=>x.count),borderColor:accent2,backgroundColor:"rgba(122,167,255,.2)",pointBackgroundColor:accent2,pointRadius:4,fill:true,tension:.35}]},options:common});
+        else{monthChart.data.labels=m.map(x=>x.label);monthChart.data.datasets[0].data=m.map(x=>x.count);monthChart.data.datasets[0].borderColor=accent2;monthChart.data.datasets[0].pointBackgroundColor=accent2;monthChart.options=common;monthChart.update()}
+        if(calorieChartCanvas){
+          const calorieOptions={...common,plugins:{...common.plugins,legend:{display:true,labels:{color:text,font:{size:12,weight:"600"}}}}};
+          const calorieData={labels:c.labels,datasets:[{label:"Net calories",data:c.netVals,borderColor:"#34a853",backgroundColor:"rgba(52,168,83,.16)",pointBackgroundColor:"#34a853",fill:true,tension:.3,pointRadius:4},{label:"Target calories",data:c.targetVals,borderColor:"#fbbc04",backgroundColor:"rgba(251,188,4,.08)",borderDash:[7,5],fill:false,tension:0,pointRadius:0}]};
+          if(!calorieChart)calorieChart=new Chart(calorieChartCanvas,{type:"line",data:calorieData,options:calorieOptions});
+          else{calorieChart.data=calorieData;calorieChart.options=calorieOptions;calorieChart.update()}
         }
+      }
+
+      function svgPin(){return `<svg viewBox="0 0 24 24" fill="none"><path d="M8 4h8l-2 5v4l3 2v1H7v-1l3-2V9L8 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`}
+      function svgEdit(){return `<svg viewBox="0 0 24 24" fill="none"><path d="m4 20 4.2-1 9.1-9.1a1.8 1.8 0 0 0 0-2.5l-.7-.7a1.8 1.8 0 0 0-2.5 0L5 15.8 4 20Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`}
+      function svgDelete(){return `<svg viewBox="0 0 24 24" fill="none"><path d="M5 7h14M10 11v6M14 11v6M8 7l1-2h6l1 2M7 7l1 12h8l1-12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+
+      function openPage(pageId){
+        navButtons.forEach(b=>b.classList.toggle("active",b.dataset.page===pageId));
+        pages.forEach(page=>page.classList.toggle("active",page.id===pageId));
+        if(pageId==="analytics-page"){
+          setTimeout(()=>{
+            if(weekChart&&typeof weekChart.resize==="function")weekChart.resize();
+            if(monthChart&&typeof monthChart.resize==="function")monthChart.resize();
+            if(calorieChart&&typeof calorieChart.resize==="function")calorieChart.resize();
+            renderCharts();
+          },80);
+        }
+      }
+      navButtons.forEach(btn=>btn.onclick=()=>{
+        navButtons.forEach(b=>b.classList.toggle("active",b===btn));
+        pages.forEach(page=>page.classList.toggle("active",page.id===btn.dataset.page));
+        if(btn.dataset.page==="analytics-page"){
+          setTimeout(()=>{
+            if(weekChart&&typeof weekChart.resize==="function")weekChart.resize();
+            if(monthChart&&typeof monthChart.resize==="function")monthChart.resize();
+            if(calorieChart&&typeof calorieChart.resize==="function")calorieChart.resize();
+            renderCharts();
+          },80);
+        }
+      });
+      overviewLinks.forEach(link=>link.onclick=()=>openPage(link.dataset.openPage));
+      themeBtn.onclick=()=>{const dark=document.body.dataset.theme==="dark";document.body.dataset.theme=dark?"light":"dark";localStorage.setItem(K_THEME,dark?"light":"dark");themeBtn.textContent=dark?"Dark theme":"Light theme";renderNotes();renderCharts()};
+      globalSearch.oninput=(e)=>{noteFilter=lower(e.target.value);renderNotes()};
+      notesBoardName.oninput=applyBoardName;
+      quickNoteTitle.onfocus=()=>noteComposer.classList.remove("collapsed");
+      quickNoteBody.oninput=updateComposerMeta;editNoteBody.oninput=updateComposerMeta;
+      checklistToggleBtn.onclick=()=>setComposerChecklistVisibility(!checklistPanel.classList.contains("show"));
+      addChecklistItemBtn.onclick=()=>{
+        const text=clean(quickChecklistInput.value);
+        if(!text)return;
+        composerChecklist=[...composerChecklist,{id:id("check"),text,checked:false}];
+        quickChecklistInput.value="";
+        setComposerChecklistVisibility(true);
+        refreshComposerChecklist();
+        quickChecklistInput.focus();
       };
-      reader.readAsText(file);
-    };
-    input.click();
-  });
+      quickChecklistInput.onkeydown=(event)=>{if(event.key==="Enter"){event.preventDefault();addChecklistItemBtn.click()}};
+      pinToggleBtn.onclick=()=>{composerPinned=!composerPinned;updateComposerMeta()};
+      clearComposerBtn.onclick=()=>{quickNoteTitle.value="";quickNoteLabel.value="";quickNoteBody.value="";composerPinned=false;composerChecklist=[];quickChecklistInput.value="";setComposerChecklistVisibility(false);refreshComposerChecklist();warn(noteWarn,"");updateComposerMeta();noteComposer.classList.add("collapsed")};
+      saveNoteBtn.onclick=()=>{
+        const title=clean(quickNoteTitle.value);
+        if(!title){warn(noteWarn,"Please add a title before saving your note.");quickNoteTitle.focus();return}
+        notes.unshift({id:id("note"),title,label:clean(quickNoteLabel.value),body:clean(quickNoteBody.value),checklist:normalizeChecklist(composerChecklist),pinned:composerPinned,updatedAt:Date.now()});
+        save(K_NOTES,notes);clearComposerBtn.click();renderAll();quickNoteTitle.focus();
+      };
+      quickNoteTitle.oninput=()=>clean(quickNoteTitle.value)&&warn(noteWarn,"");
+      editLabelFocusBtn.onclick=()=>editNoteLabel.focus();
+      editChecklistToggleBtn.onclick=()=>setChecklistVisibility(!editChecklistPanel.classList.contains("show"));
+      editPinToggleBtn.onclick=()=>{editNotePinned.checked=!editNotePinned.checked;setPinnedButtonState()};
+      editMoreBtn.onclick=(event)=>{event.stopPropagation();editActionMenu.classList.toggle("show")};
+      editMenuLabelBtn.onclick=()=>{editActionMenu.classList.remove("show");editNoteLabel.focus()};
+      editMenuChecklistBtn.onclick=()=>{editActionMenu.classList.remove("show");setChecklistVisibility(!editChecklistPanel.classList.contains("show"))};
+      editMenuDuplicateBtn.onclick=()=>{
+        const source=notes.find(n=>n.id===editNoteId.value);
+        if(!source)return;
+        notes.unshift({...source,id:id("note"),title:(source.title||"Untitled")+" (Copy)",checklist:normalizeChecklist(source.checklist),updatedAt:Date.now()});
+        save(K_NOTES,notes);
+        editActionMenu.classList.remove("show");
+        renderAll();
+      };
+      editMenuInfoBtn.onclick=()=>{
+        const note=notes.find(n=>n.id===editNoteId.value);
+        editActionMenu.classList.remove("show");
+        if(!note)return;
+        window.alert("Last updated: "+fmtTime(note.updatedAt));
+      };
+      noteActionClose.onclick=()=>closeModal(noteModalBack);
+      addEditChecklistItemBtn.onclick=()=>{
+        const text=clean(editChecklistInput.value);
+        if(!text)return;
+        editChecklist=[...editChecklist,{id:id("check"),text,checked:false}];
+        editChecklistInput.value="";
+        setChecklistVisibility(true);
+        refreshEditChecklist();
+        editChecklistInput.focus();
+      };
+      editChecklistInput.onkeydown=(event)=>{if(event.key==="Enter"){event.preventDefault();addEditChecklistItemBtn.click()}};
 
-
-  /* ── Initial renders ── */
-  renderNotes();
-  updateQuickStats();
-
-}); // end DOMContentLoaded
-</script>
+      todoForm.onsubmit=(e)=>{e.preventDefault();const text=clean(todoText.value);if(!text){warn(todoWarn,"Please enter a task description before adding it.");todoText.focus();return}todos.unshift({id:id("todo"),description:text,dueDate:todoDate.value||"",completed:false,completedAt:null,createdAt:Date.now(),updatedAt:Date.now()});save(K_TODOS,todos);todoForm.reset();warn(todoWarn,"");renderAll();todoText.focus()};
+      clearTodoBtn.onclick=()=>{todoForm.reset();warn(todoWarn,"");todoText.focus()};
+      todoTabs.forEach(btn=>btn.onclick=()=>{todoView=btn.dataset.view;renderTodos()});
+      workoutForm.onsubmit=(e)=>{
+        e.preventDefault();
+        const split=clean(workoutSplit.value)||"Push";
+        const name=clean(workoutName.value)||`${split} Workout`;
+        if(!clean(workoutDate.value)){warn(workoutWarn,"Please choose a workout date.");workoutDate.focus();return}
+        workouts.unshift({id:id("workout"),date:workoutDate.value,split,name,duration:num(workoutDuration.value),caloriesBurned:num(workoutBurn.value),notes:clean(workoutNotes.value),completed:!!workoutCompleted.checked,updatedAt:Date.now()});
+        save(K_WORKOUTS,workouts);
+        workoutForm.reset();
+        workoutDate.value=today();
+        workoutSplit.value="Push";
+        workoutCompleted.checked=true;
+        warn(workoutWarn,"");
+        renderAll();
+        workoutName.focus();
+      };
+      clearWorkoutBtn.onclick=()=>{workoutForm.reset();workoutDate.value=today();workoutSplit.value="Push";workoutCompleted.checked=true;warn(workoutWarn,"");workoutName.focus()};
+      calorieForm.onsubmit=(e)=>{
+        e.preventDefault();
+        const item=clean(calorieItem.value);
+        if(!item){warn(calorieWarn,"Please add the food or meal name.");calorieItem.focus();return}
+        if(!clean(calorieDate.value)){warn(calorieWarn,"Please choose a date for this calorie note.");calorieDate.focus();return}
+        if(!num(calorieValue.value)){warn(calorieWarn,"Please enter calories for this note.");calorieValue.focus();return}
+        calorieLogs.unshift({id:id("calorie"),date:calorieDate.value,item,calories:num(calorieValue.value),notes:clean(calorieNotes.value),updatedAt:Date.now()});
+        save(K_CALORIES,calorieLogs);
+        calorieForm.reset();
+        calorieDate.value=today();
+        warn(calorieWarn,"");
+        renderAll();
+        calorieItem.focus();
+      };
+      clearCalorieBtn.onclick=()=>{calorieForm.reset();calorieDate.value=today();warn(calorieWarn,"");calorieItem.focus()};
+      healthForm.onsubmit=(e)=>{
+        e.preventDefault();
+        health={weightKg:clean(weightInput.value),heightCm:clean(heightInput.value),maintenanceCalories:clean(maintenanceInput.value),targetDeficit:clean(deficitInput.value)||"500"};
+        save(K_HEALTH,health);
+        warn(healthWarn,"");
+        renderAll();
+      };
+      resetHealthBtn.onclick=()=>{
+        health={...defaultHealth};
+        save(K_HEALTH,health);
+        weightInput.value="";
+        heightInput.value="";
+        maintenanceInput.value="";
+        deficitInput.value="500";
+        warn(healthWarn,"");
+        renderAll();
+      };
+      noteEditForm.onsubmit=(e)=>{e.preventDefault();const title=clean(editNoteTitle.value);if(!title){warn(editNoteWarn,"Please add a title before saving your note.");editNoteTitle.focus();return}const note=notes.find(n=>n.id===editNoteId.value);if(!note)return;note.title=title;note.label=clean(editNoteLabel.value);note.body=clean(editNoteBody.value);note.checklist=normalizeChecklist(editChecklist);note.pinned=editNotePinned.checked;delete note.image;note.updatedAt=Date.now();save(K_NOTES,notes);closeModal(noteModalBack);renderAll()};
+      todoEditForm.onsubmit=(e)=>{e.preventDefault();const text=clean(editTodoText.value);if(!text){warn(editTodoWarn,"Please enter a task description before saving.");editTodoText.focus();return}const todo=todos.find(t=>t.id===editTodoId.value);if(!todo)return;todo.description=text;todo.dueDate=editTodoDate.value||"";todo.updatedAt=Date.now();save(K_TODOS,todos);closeModal(todoModalBack);renderAll()};
+      noteClose.onclick=()=>closeModal(noteModalBack);noteCancel.onclick=()=>closeModal(noteModalBack);todoClose.onclick=()=>closeModal(todoModalBack);todoCancel.onclick=()=>closeModal(todoModalBack);
+      noteModalBack.onclick=(e)=>e.target===noteModalBack&&closeModal(noteModalBack);todoModalBack.onclick=(e)=>e.target===todoModalBack&&closeModal(todoModalBack);
+      document.addEventListener("click",(e)=>{if(editActionMenu&&editActionMenu.classList.contains("show")&&!e.target.closest("#editMoreBtn")&&!e.target.closest("#editActionMenu"))editActionMenu.classList.remove("show")});
+      document.addEventListener("keydown",(e)=>{if(e.key==="Escape"){if(noteModalBack.classList.contains("open"))closeModal(noteModalBack);if(todoModalBack.classList.contains("open"))closeModal(todoModalBack)}});
+      motivateBtn.onclick=()=>say(pick(quotes));voiceToggle.onchange=()=>localStorage.setItem(K_VOICE,String(voiceToggle.checked));
+      fab.onclick=()=>{openPage("notes-page");quickNoteTitle.focus();window.scrollTo({top:0,behavior:"smooth"})};
+    })();
+  </script>
 </body>
 </html>
