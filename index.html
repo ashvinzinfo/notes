@@ -138,6 +138,16 @@
     .side-card{background:color-mix(in srgb, var(--surface) 88%, transparent);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);backdrop-filter:blur(12px);padding:1rem}
     .side-card h3{margin:0;font-size:1.05rem;letter-spacing:-.02em}
     .side-card p{margin:.35rem 0 0;color:var(--muted);font-size:.92rem;line-height:1.5}
+    .checklist-form{display:flex;gap:.5rem;margin:.75rem 0}
+    .checklist-form input{flex:1;padding:.6rem .8rem;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:.9rem}
+    .checklist-form button{padding:.6rem 1rem;border-radius:10px;font-size:.9rem}
+    .checklist-list{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
+    .checklist-item{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.6rem .8rem;border-radius:10px;background:var(--surface-soft);border:1px solid var(--line)}
+    .checklist-item label{display:flex;align-items:center;gap:.5rem;cursor:pointer;flex:1}
+    .checklist-item input[type="checkbox"]{width:1.1em;height:1.1em;cursor:pointer}
+    .checklist-text{font-size:.9rem;color:var(--text)}
+    .checklist-item .del{font-size:.8rem;padding:.3rem .6rem}
+    .empty{color:var(--muted);font-style:italic;text-align:center;padding:1rem}
     .clock-card{display:grid;gap:.75rem;align-content:start}
     .clock-time{font-size:2rem;font-weight:800;letter-spacing:-.04em;line-height:1}
     .clock-date{color:var(--muted);font-weight:600}
@@ -182,6 +192,7 @@
     .workout-head,.calorie-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;flex-wrap:wrap}
     .workout-head h3,.calorie-head h3{margin:0;font-size:1.1rem;line-height:1.35}
     .workout-meta,.calorie-meta{display:flex;gap:.5rem;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
+    .workout-extra{color:var(--muted);font-size:.85rem;margin-top:.2rem;display:flex;gap:.5rem;flex-wrap:wrap}
     .workout-note,.calorie-note{margin:0;color:var(--muted);line-height:1.55;white-space:pre-wrap}
     .split-chip{display:inline-flex;align-items:center;padding:.38rem .7rem;border-radius:999px;background:#fff4c1;color:#6f5300;font-weight:700;font-size:.8rem;border:1px solid #f0d071}
     .inline-pills{display:flex;gap:.55rem;flex-wrap:wrap}
@@ -374,6 +385,18 @@
                   <div class="clock-pill"><span>BMI</span><strong id="bmiOverview">-</strong></div>
                 </div>
               </section>
+              <section class="side-card" aria-label="Quick Checklist">
+                <h3>Quick Checklist</h3>
+                <p>Add items, check them off, and keep track of simple tasks.</p>
+                <div class="checklist-form">
+                  <input id="checklistInput" type="text" placeholder="Add a checklist item..." maxlength="120">
+                  <button id="addChecklistItem" class="btn btn-primary" type="button">Add</button>
+                </div>
+                <ul id="checklistList" class="checklist-list">
+                  <!-- items will be inserted here -->
+                </ul>
+                <div class="helper">Items are saved automatically.</div>
+              </section>
             </aside>
           </div>
             <div class="overview-links" aria-label="Overview shortcuts">
@@ -402,10 +425,6 @@
             </div>
             <div class="composer-extra">
               <div class="grid2">
-                <div class="field">
-                  <label for="notesBoardName">Notes section name</label>
-                  <input id="notesBoardName" type="text" maxlength="50" placeholder="Aswin Notes">
-                </div>
                 <div class="field">
                   <label for="quickNoteLabel">Note label</label>
                   <input id="quickNoteLabel" type="text" maxlength="40" placeholder="Work, Personal, Study...">
@@ -487,6 +506,15 @@
                     <input id="workoutDate" type="date">
                   </div>
                   <div class="field">
+                    <label for="workoutType">Workout type</label>
+                    <select id="workoutType">
+                      <option value="GYM">GYM</option>
+                      <option value="HOME">HOME</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid2">
+                  <div class="field">
                     <label for="workoutSplit">Workout split</label>
                     <select id="workoutSplit">
                       <option value="Push">Push</option>
@@ -499,31 +527,60 @@
                       <option value="Recovery">Recovery</option>
                     </select>
                   </div>
-                </div>
-                <div class="grid2">
                   <div class="field">
                     <label for="workoutName">Workout name</label>
                     <input id="workoutName" type="text" maxlength="120" placeholder="Push day chest and shoulders">
                   </div>
+                </div>
+                <div class="grid2">
                   <div class="field">
-                    <label for="workoutDuration">Duration (minutes)</label>
-                    <input id="workoutDuration" type="number" min="0" max="300" placeholder="60">
+                    <label for="workoutReps">Reps (per set)</label>
+                    <input id="workoutReps" type="number" min="0" max="100" placeholder="12">
+                  </div>
+                  <div class="field">
+                    <label for="workoutSets">Sets</label>
+                    <input id="workoutSets" type="number" min="0" max="20" placeholder="3">
                   </div>
                 </div>
                 <div class="grid2">
                   <div class="field">
+                    <label for="workoutWeight">Weight</label>
+                    <input id="workoutWeight" type="number" min="0" max="500" placeholder="50">
+                  </div>
+                  <div class="field">
+                    <label for="workoutWeightUnit">Unit</label>
+                    <select id="workoutWeightUnit">
+                      <option value="kg">kg</option>
+                      <option value="lbs">lbs</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid2">
+                  <div class="field">
+                    <label for="workoutDuration">Duration (minutes)</label>
+                    <input id="workoutDuration" type="number" min="0" max="300" placeholder="60">
+                  </div>
+                  <div class="field">
                     <label for="workoutBurn">Calories burned</label>
                     <input id="workoutBurn" type="number" min="0" max="3000" placeholder="320">
                   </div>
-                  <div class="field">
-                    <label for="workoutNotes">Workout note</label>
-                    <input id="workoutNotes" type="text" maxlength="180" placeholder="Incline bench, rows, squats...">
+                </div>
+                <div class="field">
+                  <label for="workoutNotes">Quick note</label>
+                  <input id="workoutNotes" type="text" maxlength="180" placeholder="Incline bench, rows, squats...">
+                </div>
+                <div class="field">
+                  <label for="workoutDetailedNotes">Detailed notes (auto-saved draft)</label>
+                  <textarea id="workoutDetailedNotes" maxlength="2000" placeholder="Add detailed notes about your workout, feelings, progress..."></textarea>
+                  <div class="helper">
+                    <span id="notesDraftStatus" class="warn"></span>
+                    <button id="saveNotesBtn" class="btn btn-soft" type="button">Save Notes</button>
                   </div>
                 </div>
                 <div class="switch-row">
                   <label class="switch"><input id="workoutCompleted" type="checkbox" checked> Mark session completed</label>
                 </div>
-                <div class="helper"><span id="workoutWarn" class="warn"></span><span>Use this section for your gym split and calorie burn tracking.</span></div>
+                <div class="helper"><span id="workoutWarn" class="warn"></span><span>Enhanced workout tracking with nutrition integration and detailed notes.</span></div>
                 <div class="form-actions">
                   <button class="btn btn-primary" type="submit">Add workout</button>
                   <button id="clearWorkoutBtn" class="btn btn-soft" type="button">Clear</button>
@@ -563,9 +620,13 @@
                     <input id="calorieValue" type="number" min="0" max="5000" placeholder="450">
                   </div>
                   <div class="field">
-                    <label for="calorieNotes">Calories note</label>
-                    <input id="calorieNotes" type="text" maxlength="160" placeholder="Protein heavy, outside food, snack...">
+                    <label for="calorieProtein">Protein (g)</label>
+                    <input id="calorieProtein" type="number" min="0" max="200" placeholder="30">
                   </div>
+                </div>
+                <div class="field">
+                  <label for="calorieNotes">Calories note</label>
+                  <input id="calorieNotes" type="text" maxlength="160" placeholder="Protein heavy, outside food, snack...">
                 </div>
                 <div class="helper"><span id="calorieWarn" class="warn"></span><span>Net calories use food intake minus completed workout calories burned.</span></div>
                 <div class="form-actions">
@@ -682,6 +743,10 @@
                 <div><h2>Calories vs target</h2><p>Daily net calories compared with your target calories for the last 7 days.</p></div>
                 <canvas id="calorieChart"></canvas>
               </article>
+              <article class="chart">
+                <div><h2>Workout Progression</h2><p>Weight, reps, and sets trends over time for selected workout type.</p></div>
+                <canvas id="workoutChart"></canvas>
+              </article>
             </div>
           </div>
         </section>
@@ -793,7 +858,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   <script>
     (() => {
-      const K_NOTES="aswin_notes",K_TODOS="aswin_todos",K_WORKOUTS="aswin_workouts",K_CALORIES="aswin_calories",K_HEALTH="aswin_health_profile",K_THEME="aswin_keep_theme",K_VOICE="aswin_voice_completion",K_BOARD="aswin_board_name";
+      const K_NOTES="aswin_notes",K_TODOS="aswin_todos",K_WORKOUTS="aswin_workouts",K_CALORIES="aswin_calories",K_HEALTH="aswin_health_profile",K_THEME="aswin_keep_theme",K_VOICE="aswin_voice_completion",K_BOARD="aswin_board_name",K_CHECKLIST="aswin_checklist";
       const qs=(s)=>document.querySelector(s),qsa=(s)=>[...document.querySelectorAll(s)];
       const navButtons=qsa(".nav-btn"),pages=qsa(".page"),todoTabs=qsa(".todo-tab"),overviewLinks=qsa(".overview-link");
       const globalSearch=qs("#globalSearch"),themeBtn=qs("#themeBtn"),fab=qs("#fab");
@@ -801,12 +866,13 @@
       const clockTime=qs("#clockTime"),clockDate=qs("#clockDate"),clockDay=qs("#clockDay"),clockMonth=qs("#clockMonth"),clockDateNum=qs("#clockDateNum"),clockYear=qs("#clockYear");
       const noteComposer=qs("#noteComposer"),quickNoteTitle=qs("#quickNoteTitle"),quickNoteLabel=qs("#quickNoteLabel"),quickNoteBody=qs("#quickNoteBody");
       const checklistToggleBtn=qs("#checklistToggleBtn"),checklistPanel=qs("#checklistPanel"),quickChecklistInput=qs("#quickChecklistInput"),addChecklistItemBtn=qs("#addChecklistItemBtn"),quickChecklistList=qs("#quickChecklistList");
-      const notesBoardName=qs("#notesBoardName"),noteWarn=qs("#noteWarn"),noteMeta=qs("#noteMeta"),saveNoteBtn=qs("#saveNoteBtn"),clearComposerBtn=qs("#clearComposerBtn");
+      const checklistInput=qs("#checklistInput"),addChecklistItem=qs("#addChecklistItem"),checklistList=qs("#checklistList");
+      const noteWarn=qs("#noteWarn"),noteMeta=qs("#noteMeta"),saveNoteBtn=qs("#saveNoteBtn"),clearComposerBtn=qs("#clearComposerBtn");
       const pinToggleBtn=qs("#pinToggleBtn");
       const pinnedNotes=qs("#pinnedNotes"),otherNotes=qs("#otherNotes"),notesHeading=qs("#notesHeading");
       const todoForm=qs("#todoForm"),todoText=qs("#todoText"),todoDate=qs("#todoDate"),todoWarn=qs("#todoWarn"),clearTodoBtn=qs("#clearTodoBtn"),todoList=qs("#todoList");
-      const workoutForm=qs("#workoutForm"),workoutDate=qs("#workoutDate"),workoutSplit=qs("#workoutSplit"),workoutName=qs("#workoutName"),workoutDuration=qs("#workoutDuration"),workoutBurn=qs("#workoutBurn"),workoutNotes=qs("#workoutNotes"),workoutCompleted=qs("#workoutCompleted"),workoutWarn=qs("#workoutWarn"),clearWorkoutBtn=qs("#clearWorkoutBtn"),workoutList=qs("#workoutList");
-      const calorieForm=qs("#calorieForm"),calorieDate=qs("#calorieDate"),calorieItem=qs("#calorieItem"),calorieValue=qs("#calorieValue"),calorieNotes=qs("#calorieNotes"),calorieWarn=qs("#calorieWarn"),clearCalorieBtn=qs("#clearCalorieBtn"),calorieList=qs("#calorieList");
+      const workoutForm=qs("#workoutForm"),workoutDate=qs("#workoutDate"),workoutType=qs("#workoutType"),workoutSplit=qs("#workoutSplit"),workoutName=qs("#workoutName"),workoutDuration=qs("#workoutDuration"),workoutBurn=qs("#workoutBurn"),workoutNotes=qs("#workoutNotes"),workoutCompleted=qs("#workoutCompleted"),workoutWarn=qs("#workoutWarn"),clearWorkoutBtn=qs("#clearWorkoutBtn"),workoutList=qs("#workoutList"),workoutReps=qs("#workoutReps"),workoutSets=qs("#workoutSets"),workoutWeight=qs("#workoutWeight"),workoutWeightUnit=qs("#workoutWeightUnit"),workoutProtein=qs("#workoutProtein"),workoutDetailedNotes=qs("#workoutDetailedNotes"),notesDraftStatus=qs("#notesDraftStatus"),saveNotesBtn=qs("#saveNotesBtn");
+      const calorieForm=qs("#calorieForm"),calorieDate=qs("#calorieDate"),calorieItem=qs("#calorieItem"),calorieValue=qs("#calorieValue"),calorieProtein=qs("#calorieProtein"),calorieNotes=qs("#calorieNotes"),calorieWarn=qs("#calorieWarn"),clearCalorieBtn=qs("#clearCalorieBtn"),calorieList=qs("#calorieList");
       const healthForm=qs("#healthForm"),weightInput=qs("#weightInput"),heightInput=qs("#heightInput"),maintenanceInput=qs("#maintenanceInput"),deficitInput=qs("#deficitInput"),healthWarn=qs("#healthWarn"),resetHealthBtn=qs("#resetHealthBtn");
       const noteModalBack=qs("#noteModalBack"),todoModalBack=qs("#todoModalBack"),noteEditForm=qs("#noteEditForm"),todoEditForm=qs("#todoEditForm");
       const editNoteId=qs("#editNoteId"),editNoteTitle=qs("#editNoteTitle"),editNoteLabel=qs("#editNoteLabel"),editNoteBody=qs("#editNoteBody"),editNotePinned=qs("#editNotePinned"),editNoteWarn=qs("#editNoteWarn"),editNoteMeta=qs("#editNoteMeta");
@@ -819,11 +885,11 @@
       const calorieTodayTotal=qs("#calorieTodayTotal"),burnedTodayTotal=qs("#burnedTodayTotal"),netTodayTotal=qs("#netTodayTotal"),deficitTodayTotal=qs("#deficitTodayTotal");
       const bmiValue=qs("#bmiValue"),bmiCategory=qs("#bmiCategory"),targetCaloriesValue=qs("#targetCaloriesValue"),netCaloriesValue=qs("#netCaloriesValue"),actualDeficitValue=qs("#actualDeficitValue"),remainingTargetValue=qs("#remainingTargetValue"),deficitMeter=qs("#deficitMeter"),healthInsightText=qs("#healthInsightText");
       const statToday=qs("#statToday"),statWeek=qs("#statWeek"),statOpen=qs("#statOpen"),statRate=qs("#statRate"),statWorkoutWeek=qs("#statWorkoutWeek"),statDeficit=qs("#statDeficit"),monthRows=qs("#monthRows");
-      const weekChartCanvas=qs("#weekChart"),monthChartCanvas=qs("#monthChart"),calorieChartCanvas=qs("#calorieChart");
+      const weekChartCanvas=qs("#weekChart"),monthChartCanvas=qs("#monthChart"),calorieChartCanvas=qs("#calorieChart"),workoutChartCanvas=qs("#workoutChart");
       const quotes=["Small progress still changes the story. Keep going.","Consistency is your quiet superpower. Use it today.","Finish one meaningful thing and the rest of the day feels lighter.","Momentum grows when you act before you overthink.","You are building trust with yourself one completed task at a time.","A calm plan and one focused step can shift everything."];
       const cheers=["Nice work. Another task is complete.","Excellent. Your progress is real.","Well done. Keep that momentum alive.","Great job. One more win on the board."];
       const defaultHealth={weightKg:"",heightCm:"",maintenanceCalories:"",targetDeficit:"500"};
-      let notes=load(K_NOTES),todos=load(K_TODOS),workouts=load(K_WORKOUTS),calorieLogs=load(K_CALORIES),health=loadObject(K_HEALTH,defaultHealth),noteFilter="",todoView="all",composerPinned=false,composerChecklist=[],editChecklist=[],lastFocus=null,weekChart=null,monthChart=null,calorieChart=null;
+      let notes=load(K_NOTES),todos=load(K_TODOS),workouts=load(K_WORKOUTS),calorieLogs=load(K_CALORIES),health=loadObject(K_HEALTH,defaultHealth),checklist=load(K_CHECKLIST),noteFilter="",todoView="all",composerPinned=false,composerChecklist=[],editChecklist=[],lastFocus=null,weekChart=null,monthChart=null,calorieChart=null,workoutChart=null;
       let ambientCleanup=()=>{};
       let clockTimer=0;
 
@@ -831,7 +897,6 @@
       ambientCleanup=initAmbientBackground();
       startClock();
       voiceToggle.checked=localStorage.getItem(K_VOICE)!=="false";
-      notesBoardName.value=localStorage.getItem(K_BOARD)||"Aswin Notes";
       workoutDate.value=today();
       calorieDate.value=today();
       weightInput.value=health.weightKg||"";
@@ -848,6 +913,7 @@
       function id(prefix){return prefix+"-"+(crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(16).slice(2))}
       function clean(v){return String(v||"").trim()}
       function lower(v){return clean(v).toLowerCase()}
+      function escapeHtml(text){const div=document.createElement("div");div.textContent=text;return div.innerHTML}
       function num(v){const n=Number(v);return Number.isFinite(n)?n:0}
       function fmtDate(iso){if(!iso)return"No due date";return new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric",year:"numeric"}).format(new Date(iso+"T00:00:00"))}
       function fmtTime(ms){return new Intl.DateTimeFormat(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}).format(new Date(ms))}
@@ -936,7 +1002,7 @@
       function openModal(back,focusEl){back.classList.add("open");back.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";setTimeout(()=>focusEl.focus(),40)}
       function closeModal(back){back.classList.remove("open");back.setAttribute("aria-hidden","true");document.body.style.overflow="";if(editActionMenu)editActionMenu.classList.remove("show");if(lastFocus&&lastFocus.focus)lastFocus.focus()}
       function initTheme(){const saved=localStorage.getItem(K_THEME);const dark=saved===null?true:saved==="dark";document.body.dataset.theme=dark?"dark":"light";themeBtn.textContent=dark?"Light theme":"Dark theme"}
-      function applyBoardName(){const name=clean(notesBoardName.value)||"Aswin Notes";notesHeading.textContent=name;localStorage.setItem(K_BOARD,name)}
+      function applyBoardName(){notesHeading.textContent="Notes"}
       function setComposerChecklistVisibility(show){
         checklistPanel.classList.toggle("show",show);
         checklistToggleBtn.classList.toggle("active",show);
@@ -1033,7 +1099,7 @@
         };
       }
 
-      function renderAll(){renderNotes();renderTodos();renderWorkouts();renderCalories();renderHealth();renderStats();renderCharts()}
+      function renderAll(){renderNotes();renderTodos();renderWorkouts();renderCalories();renderHealth();renderStats();renderCharts();renderChecklist()}
 
       function renderNotes(){
         const items=filteredNotes(),pinned=items.filter(n=>n.pinned),others=items.filter(n=>!n.pinned);
@@ -1106,12 +1172,21 @@
           items.forEach((session)=>{
             const card=document.createElement("article");
             card.className="workout-card";
-            card.innerHTML=`<div class="workout-head"><div><h3></h3><div class="workout-meta"><span class="split-chip"></span><span></span><span></span></div></div><div class="card-actions"><button class="btn btn-soft toggle" type="button"></button><button class="btn danger del" type="button">Delete</button></div></div><p class="workout-note"></p>`;
+            card.innerHTML=`<div class="workout-head"><div><h3></h3><div class="workout-meta"><span class="split-chip"></span><span></span><span></span></div><div class="workout-extra"></div></div><div class="card-actions"><button class="btn btn-soft toggle" type="button"></button><button class="btn danger del" type="button">Delete</button></div></div><p class="workout-note"></p>`;
             card.querySelector("h3").textContent=session.name;
             const meta=card.querySelectorAll(".workout-meta span");
             meta[0].textContent=session.split;
             meta[1].textContent=fmtDate(session.date);
             meta[2].textContent=`${Math.round(num(session.duration)||0)} min • ${kcal(session.caloriesBurned)}`;
+            // Build extra details
+            const extraParts=[];
+            if(session.type) extraParts.push(session.type);
+            if(session.reps) extraParts.push(`${session.reps} reps`);
+            if(session.sets) extraParts.push(`${session.sets} sets`);
+            if(session.weight) extraParts.push(`${session.weight} ${session.weightUnit||'kg'}`);
+            if(session.protein) extraParts.push(`${session.protein}g protein`);
+            const extraDiv=card.querySelector(".workout-extra");
+            extraDiv.textContent=extraParts.join(" • ");
             card.querySelector(".workout-note").textContent=session.notes||"No extra workout note.";
             const toggleBtn=card.querySelector(".toggle");
             toggleBtn.textContent=session.completed?"Completed":"Mark done";
@@ -1155,6 +1230,35 @@
         burnedTodayTotal.textContent=kcal(todayBurn);
         netTodayTotal.textContent=kcal(todayNet);
         deficitTodayTotal.textContent=kcal(todayDeficit);
+      }
+
+      function renderChecklist(){
+        if(!checklistList)return;
+        const items=[...checklist].sort((a,b)=>b.updatedAt-a.updatedAt);
+        checklistList.innerHTML="";
+        if(!items.length){
+          checklistList.innerHTML=`<li class="empty">No checklist items yet. Add your first item.</li>`;
+        }else{
+          items.forEach((item)=>{
+            const li=document.createElement("li");
+            li.className="checklist-item";
+            li.innerHTML=`<label><input type="checkbox" ${item.checked?'checked':''}><span class="checklist-text">${escapeHtml(item.text)}</span></label><button class="btn danger small del" type="button">Delete</button>`;
+            li.querySelector("input").onchange=()=>{
+              item.checked=!item.checked;
+              item.updatedAt=Date.now();
+              save(K_CHECKLIST,checklist);
+              renderChecklist();
+            };
+            li.querySelector(".del").onclick=()=>{
+              if(confirm(`Delete "${item.text}"?`)){
+                checklist=checklist.filter(i=>i.id!==item.id);
+                save(K_CHECKLIST,checklist);
+                renderChecklist();
+              }
+            };
+            checklistList.appendChild(li);
+          });
+        }
       }
 
       function renderHealth(){
@@ -1210,6 +1314,18 @@
           targetVals.push(target);
         }
         return{labels,netVals,targetVals};
+      }
+      function workoutProgressionData(){
+        // Get last 10 completed workouts with weight data, sorted by date
+        const filtered = workouts
+          .filter(s => s.completed && s.weight > 0)
+          .sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+          .slice(-10);
+        const labels = filtered.map(s => new Date(s.date).toLocaleDateString(undefined, {month:'short', day:'numeric'}));
+        const weightData = filtered.map(s => s.weight);
+        const repsData = filtered.map(s => s.reps || 0);
+        const setsData = filtered.map(s => s.sets || 0);
+        return {labels, weightData, repsData, setsData};
       }
       function renderCharts(){
         const w=weekData(),m=monthData(),c=calorieWeekData();monthRows.innerHTML=m.map(r=>`<tr><td>${r.label}</td><td>${r.count}</td></tr>`).join("");
@@ -1282,9 +1398,16 @@
       overviewLinks.forEach(link=>link.onclick=()=>openPage(link.dataset.openPage));
       themeBtn.onclick=()=>{const dark=document.body.dataset.theme==="dark";document.body.dataset.theme=dark?"light":"dark";localStorage.setItem(K_THEME,dark?"light":"dark");themeBtn.textContent=dark?"Dark theme":"Light theme";renderNotes();renderCharts()};
       globalSearch.oninput=(e)=>{noteFilter=lower(e.target.value);renderNotes()};
-      notesBoardName.oninput=applyBoardName;
+      const updateSaveButton=()=>{
+        saveNoteBtn.disabled=!clean(quickNoteTitle.value);
+      };
       quickNoteTitle.onfocus=()=>noteComposer.classList.remove("collapsed");
+      quickNoteTitle.oninput=()=>{
+        clean(quickNoteTitle.value)&&warn(noteWarn,"");
+        updateSaveButton();
+      };
       quickNoteBody.oninput=updateComposerMeta;editNoteBody.oninput=updateComposerMeta;
+      updateSaveButton(); // initial state
       checklistToggleBtn.onclick=()=>setComposerChecklistVisibility(!checklistPanel.classList.contains("show"));
       addChecklistItemBtn.onclick=()=>{
         const text=clean(quickChecklistInput.value);
@@ -1296,6 +1419,17 @@
         quickChecklistInput.focus();
       };
       quickChecklistInput.onkeydown=(event)=>{if(event.key==="Enter"){event.preventDefault();addChecklistItemBtn.click()}};
+      // Standalone checklist
+      addChecklistItem.onclick=()=>{
+        const text=clean(checklistInput.value);
+        if(!text)return;
+        checklist=[...checklist,{id:id("check"),text,checked:false,updatedAt:Date.now()}];
+        save(K_CHECKLIST,checklist);
+        checklistInput.value="";
+        renderChecklist();
+        checklistInput.focus();
+      };
+      checklistInput.onkeydown=(event)=>{if(event.key==="Enter"){event.preventDefault();addChecklistItem.click()}};
       pinToggleBtn.onclick=()=>{composerPinned=!composerPinned;updateComposerMeta()};
       clearComposerBtn.onclick=()=>{quickNoteTitle.value="";quickNoteLabel.value="";quickNoteBody.value="";composerPinned=false;composerChecklist=[];quickChecklistInput.value="";setComposerChecklistVisibility(false);refreshComposerChecklist();warn(noteWarn,"");updateComposerMeta();noteComposer.classList.add("collapsed")};
       saveNoteBtn.onclick=()=>{
@@ -1304,7 +1438,6 @@
         notes.unshift({id:id("note"),title,label:clean(quickNoteLabel.value),body:clean(quickNoteBody.value),checklist:normalizeChecklist(composerChecklist),pinned:composerPinned,updatedAt:Date.now()});
         save(K_NOTES,notes);clearComposerBtn.click();renderAll();quickNoteTitle.focus();
       };
-      quickNoteTitle.oninput=()=>clean(quickNoteTitle.value)&&warn(noteWarn,"");
       editLabelFocusBtn.onclick=()=>editNoteLabel.focus();
       editChecklistToggleBtn.onclick=()=>setChecklistVisibility(!editChecklistPanel.classList.contains("show"));
       editPinToggleBtn.onclick=()=>{editNotePinned.checked=!editNotePinned.checked;setPinnedButtonState()};
@@ -1345,24 +1478,43 @@
         const split=clean(workoutSplit.value)||"Push";
         const name=clean(workoutName.value)||`${split} Workout`;
         if(!clean(workoutDate.value)){warn(workoutWarn,"Please choose a workout date.");workoutDate.focus();return}
-        workouts.unshift({id:id("workout"),date:workoutDate.value,split,name,duration:num(workoutDuration.value),caloriesBurned:num(workoutBurn.value),notes:clean(workoutNotes.value),completed:!!workoutCompleted.checked,updatedAt:Date.now()});
+        workouts.unshift({
+          id:id("workout"),
+          date:workoutDate.value,
+          type:clean(workoutType.value)||"GYM",
+          split,
+          name,
+          reps:num(workoutReps.value),
+          sets:num(workoutSets.value),
+          weight:num(workoutWeight.value),
+          weightUnit:clean(workoutWeightUnit.value)||"kg",
+          protein:num(workoutProtein.value),
+          duration:num(workoutDuration.value),
+          caloriesBurned:num(workoutBurn.value),
+          notes:clean(workoutNotes.value),
+          detailedNotes:clean(workoutDetailedNotes.value),
+          completed:!!workoutCompleted.checked,
+          updatedAt:Date.now()
+        });
         save(K_WORKOUTS,workouts);
         workoutForm.reset();
         workoutDate.value=today();
+        workoutType.value="GYM";
         workoutSplit.value="Push";
+        workoutWeightUnit.value="kg";
         workoutCompleted.checked=true;
         warn(workoutWarn,"");
         renderAll();
         workoutName.focus();
       };
-      clearWorkoutBtn.onclick=()=>{workoutForm.reset();workoutDate.value=today();workoutSplit.value="Push";workoutCompleted.checked=true;warn(workoutWarn,"");workoutName.focus()};
+      clearWorkoutBtn.onclick=()=>{workoutForm.reset();workoutDate.value=today();workoutType.value="GYM";workoutSplit.value="Push";workoutWeightUnit.value="kg";workoutCompleted.checked=true;warn(workoutWarn,"");workoutName.focus()};
       calorieForm.onsubmit=(e)=>{
         e.preventDefault();
         const item=clean(calorieItem.value);
         if(!item){warn(calorieWarn,"Please add the food or meal name.");calorieItem.focus();return}
         if(!clean(calorieDate.value)){warn(calorieWarn,"Please choose a date for this calorie note.");calorieDate.focus();return}
         if(!num(calorieValue.value)){warn(calorieWarn,"Please enter calories for this note.");calorieValue.focus();return}
-        calorieLogs.unshift({id:id("calorie"),date:calorieDate.value,item,calories:num(calorieValue.value),notes:clean(calorieNotes.value),updatedAt:Date.now()});
+        calorieLogs.unshift({id:id("calorie"),date:calorieDate.value,item,calories:num(calorieValue.value),protein:num(calorieProtein.value),notes:clean(calorieNotes.value),updatedAt:Date.now()});
         save(K_CALORIES,calorieLogs);
         calorieForm.reset();
         calorieDate.value=today();
